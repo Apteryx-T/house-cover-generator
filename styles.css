@@ -1,3 +1,83 @@
+@font-face {
+  font-family: "Cover Bodoni";
+  src: url("fonts/BodoniModa-Variable.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Cover Smiley Sans";
+  src: url("fonts/SmileySans-Oblique.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Cover YouShe";
+  src: url("fonts/YouSheBiaoTiHei.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Cover Zcool Happy";
+  src: url("fonts/ZcoolHappy.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Cover Cormorant";
+  src: url("fonts/CormorantGaramond-Variable.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Cover FangYuan";
+  src: url("fonts/AlimamaFangYuan.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Cover Instrument";
+  src: url("fonts/InstrumentSerif-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Cover ShuHei";
+  src: url("fonts/AlimamaShuHei-Bold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Cover Optimum";
+  src: url("fonts/Qtoptimum-Bold.otf") format("opentype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Cover PangMen";
+  src: url("fonts/PangMenZhengDao.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
+
 :root {
   color-scheme: dark;
   --bg: #101115;

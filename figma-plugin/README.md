@@ -1,38 +1,45 @@
 # House Cover UI Kit Figma Plugin
 
-这个插件用于把房源封面项目里的视频内 UI 组件库生成到 Figma。
+This local Figma plugin generates a video UI component library for the house cover generator project.
 
-## 当前包含
+## Components
 
-- 房源大字版
-  - InfoCard
-  - SpaceTag
-  - FeatureText
-  - CTAButton
-  - SummaryCard
-- 探家综艺版
-  - InfoSticker
-  - SpaceBubble
-  - FeatureCaption
-  - CTASticker
-  - SummarySticker
+Estate Bold:
+- InfoCard
+- SpaceTag
+- FeatureText
+- CTAButton
+- SummaryCard
 
-## 安装方式
+Variety Visit:
+- InfoSticker
+- SpaceBubble
+- FeatureCaption
+- CTASticker
+- SummarySticker
 
-1. 打开 Figma Desktop 或网页版。
-2. 进入任意设计文件。
-3. 菜单选择 `Plugins` -> `Development` -> `Import plugin from manifest...`
-4. 选择本目录里的 `manifest.json`。
-5. 在 `Plugins` -> `Development` 中运行 `House Cover UI Kit`。
+## Install
 
-## 使用方式
+1. Open Figma.
+2. Open any design file.
+3. Go to `Plugins` -> `Development` -> `Import plugin from manifest...`.
+4. Select `figma-plugin/manifest.json`.
+5. Run `House Cover UI Kit` from `Plugins` -> `Development`.
 
-1. 选择生成范围：全部风格 / 房源大字版 / 探家综艺版。
-2. 点击 `生成组件库`。
-3. 插件会在当前 Figma 页面生成组件预览画板。
+## Use
 
-## 后续计划
+1. Choose a scope: all styles, Estate Bold, or Variety Visit.
+2. Click `Generate UI Kit`.
+3. The plugin creates component boards on the current Figma page.
 
-- 从 `design-system.json` 读取组件配置。
-- 与封面生成器共用同一套主题 token。
-- 增加视频时间轴组件和动效标注。
+## Export
+
+1. Click `Generate UI Kit` first.
+2. Click `Export SVG Zip`.
+3. Click the `Download Zip` link shown in the plugin UI.
+
+The zip contains:
+- SVG files for generated components.
+- `design-system.json` with color and sample text tokens.
+
+Figma plugins cannot silently write files to your computer, so the plugin creates a downloadable zip link inside the plugin UI.

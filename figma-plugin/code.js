@@ -1,12 +1,14 @@
-figma.showUI(__html__, { width: 360, height: 360, themeColors: true });
+figma.showUI(__html__, { width: 380, height: 430, themeColors: true });
 
 const FONT = { family: "Inter", style: "Regular" };
 const FONT_BOLD = { family: "Inter", style: "Bold" };
 
 const styles = {
   estateBold: {
-    name: "房源大字版",
-    description: "信息密度高，适合房源讲解和强转化视频。",
+    name: "Estate Bold",
+    title: "House Listing Bold",
+    description: "Dense listing UI for sales-driven house videos.",
+    folder: "estate-bold",
     colors: {
       bg: "#111217",
       panel: "#1b1d24",
@@ -17,16 +19,18 @@ const styles = {
       stroke: "#050505",
     },
     sample: {
-      info: ["建面 78㎡", "一室一厅", "南向", "月租 1.6w"],
-      space: "客厅",
-      feature: "CBD 通勤 15 分钟",
-      cta: "私信看房",
-      summary: "国贸｜78㎡｜一居｜适合 CBD 通勤",
+      info: ["78 sqm", "1 Bed 1 Living", "South", "Rent 16k"],
+      space: "Living Room",
+      feature: "15 min to CBD",
+      cta: "DM for tour",
+      summary: "Guomao | 78 sqm | 1 bed | CBD commute",
     },
   },
   varietyVisit: {
-    name: "探家综艺版",
-    description: "轻松、有互动感，适合人物出镜和探家内容。",
+    name: "Variety Visit",
+    title: "Home Visit Variety",
+    description: "Light, sticker-like UI for host-led room tour videos.",
+    folder: "variety-visit",
     colors: {
       bg: "#fff4ec",
       panel: "#ffffff",
@@ -38,13 +42,26 @@ const styles = {
       stroke: "#8f6a4b",
     },
     sample: {
-      info: ["新家 Roomtour", "拍摄的一天", "超想迷你家", "欢迎来玩"],
-      space: "现在看客厅",
-      feature: "百万探家博主来我家",
-      cta: "评论想看户型图",
-      summary: "这套房适合爱生活、爱收纳、爱阳光的人",
+      info: ["New Roomtour", "Shoot day", "Mini home", "Welcome"],
+      space: "Now: Living Room",
+      feature: "A popular home blogger visits",
+      cta: "Comment for floor plan",
+      summary: "For people who love light, storage, and cozy living.",
     },
   },
+};
+
+const componentMeta = {
+  "Estate / InfoCard": { styleId: "estateBold", name: "info-card" },
+  "Estate / SpaceTag": { styleId: "estateBold", name: "space-tag" },
+  "Estate / FeatureText": { styleId: "estateBold", name: "feature-text" },
+  "Estate / CTAButton": { styleId: "estateBold", name: "cta-button" },
+  "Estate / SummaryCard": { styleId: "estateBold", name: "summary-card" },
+  "Variety / InfoSticker": { styleId: "varietyVisit", name: "info-sticker" },
+  "Variety / SpaceBubble": { styleId: "varietyVisit", name: "space-bubble" },
+  "Variety / FeatureCaption": { styleId: "varietyVisit", name: "feature-caption" },
+  "Variety / CTASticker": { styleId: "varietyVisit", name: "cta-sticker" },
+  "Variety / SummarySticker": { styleId: "varietyVisit", name: "summary-sticker" },
 };
 
 function hexToRgb(hex) {
@@ -107,11 +124,17 @@ function createRoundRect(parent, x, y, width, height, color, radius = 24, opacit
 
 function createComponentFrame(parent, name, x, y, width, height) {
   const component = figma.createComponent();
+  const meta = componentMeta[name];
   component.name = name;
   component.x = x;
   component.y = y;
   component.resize(width, height);
   component.fills = [];
+  if (meta) {
+    component.setPluginData("houseUiKit", "component");
+    component.setPluginData("styleId", meta.styleId);
+    component.setPluginData("exportName", meta.name);
+  }
   parent.appendChild(component);
   return component;
 }
@@ -122,7 +145,7 @@ async function createEstateComponents(board, style) {
   const info = createComponentFrame(board, "Estate / InfoCard", 56, 190, 560, 156);
   const infoBg = createRoundRect(info, 0, 0, 560, 156, c.panel, 18, 0.96);
   addDropShadow(infoBg, "#000000", 0.22, 0, 14, 28);
-  await createText(info, "关键信息", 24, 20, 24, c.muted, { bold: true });
+  await createText(info, "Key Info", 24, 20, 24, c.muted, { bold: true });
   const columns = style.sample.info;
   for (let i = 0; i < columns.length; i += 1) {
     const x = 24 + i * 132;
@@ -136,7 +159,7 @@ async function createEstateComponents(board, style) {
 
   const feature = createComponentFrame(board, "Estate / FeatureText", 56, 520, 690, 150);
   await createText(feature, style.sample.feature, 0, 0, 54, c.text, { bold: true });
-  await createText(feature, "步行到地铁，通勤更稳", 4, 78, 30, c.accent, { bold: true });
+  await createText(feature, "Walkable commute, stable daily rhythm", 4, 78, 30, c.accent, { bold: true });
 
   const cta = createComponentFrame(board, "Estate / CTAButton", 56, 720, 320, 92);
   const ctaBg = createRoundRect(cta, 0, 0, 320, 92, c.accent, 18);
@@ -145,7 +168,7 @@ async function createEstateComponents(board, style) {
 
   const summary = createComponentFrame(board, "Estate / SummaryCard", 56, 870, 680, 176);
   createRoundRect(summary, 0, 0, 680, 176, c.panel, 18, 0.96);
-  await createText(summary, "结尾总结", 28, 24, 26, c.muted, { bold: true });
+  await createText(summary, "Wrap-up", 28, 24, 26, c.muted, { bold: true });
   await createText(summary, style.sample.summary, 28, 78, 34, c.text, { bold: true, width: 610 });
 }
 
@@ -157,8 +180,8 @@ async function createVarietyComponents(board, style) {
   infoBg.strokes = solid(c.stroke);
   infoBg.strokeWeight = 4;
   addDropShadow(infoBg, c.stroke, 0.18, 8, 10, 0);
-  await createText(info, "今天聊什么", 28, 24, 30, c.accent, { bold: true });
-  await createText(info, style.sample.info.join(" ｜ "), 28, 82, 30, c.text, { bold: true, width: 500 });
+  await createText(info, "What we talk about", 28, 24, 30, c.accent, { bold: true });
+  await createText(info, style.sample.info.join(" | "), 28, 82, 30, c.text, { bold: true, width: 500 });
 
   const space = createComponentFrame(board, "Variety / SpaceBubble", 56, 416, 310, 86);
   const bubble = createRoundRect(space, 0, 0, 310, 86, c.panelSoft, 43);
@@ -168,7 +191,7 @@ async function createVarietyComponents(board, style) {
 
   const feature = createComponentFrame(board, "Variety / FeatureCaption", 56, 560, 720, 170);
   await createText(feature, style.sample.feature, 0, 0, 50, c.accent, { bold: true, width: 720 });
-  await createText(feature, "都聊了点啥?", 0, 82, 60, c.text, { bold: true });
+  await createText(feature, "What did we chat about?", 0, 82, 60, c.text, { bold: true });
 
   const cta = createComponentFrame(board, "Variety / CTASticker", 56, 780, 430, 104);
   const ctaBg = createRoundRect(cta, 0, 0, 430, 104, c.accent2, 26);
@@ -181,22 +204,24 @@ async function createVarietyComponents(board, style) {
   const summaryBg = createRoundRect(summary, 0, 0, 700, 178, c.panel, 28);
   summaryBg.strokes = solid(c.accent);
   summaryBg.strokeWeight = 4;
-  await createText(summary, "最后总结", 30, 24, 28, c.accent, { bold: true });
+  await createText(summary, "Final takeaway", 30, 24, 28, c.accent, { bold: true });
   await createText(summary, style.sample.summary, 30, 78, 34, c.text, { bold: true, width: 620 });
 }
 
 async function createStyleBoard(styleId, index) {
   const style = styles[styleId];
   const board = figma.createFrame();
-  board.name = `${style.name} / 视频组件库`;
+  board.name = `${style.name} / Video UI Kit`;
   board.x = index * 860;
   board.y = 0;
   board.resize(820, 1220);
   board.cornerRadius = 28;
   board.fills = solid(style.colors.bg);
+  board.setPluginData("houseUiKit", "board");
+  board.setPluginData("styleId", styleId);
   figma.currentPage.appendChild(board);
 
-  await createText(board, style.name, 56, 46, 46, style.colors.text, { bold: true });
+  await createText(board, style.title, 56, 46, 46, style.colors.text, { bold: true });
   await createText(board, style.description, 58, 106, 24, style.colors.muted, { width: 680 });
 
   if (styleId === "estateBold") {
@@ -219,7 +244,80 @@ async function createLibrary(styleId) {
   }
 
   figma.viewport.scrollAndZoomIntoView(boards);
-  figma.ui.postMessage({ text: "组件库已生成到当前页面。" });
+  figma.ui.postMessage({ type: "status", text: "UI kit generated on the current page." });
+}
+
+function bytesToBase64(bytes) {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  let output = "";
+  for (let i = 0; i < bytes.length; i += 3) {
+    const a = bytes[i];
+    const b = i + 1 < bytes.length ? bytes[i + 1] : 0;
+    const c = i + 2 < bytes.length ? bytes[i + 2] : 0;
+    const triplet = (a << 16) | (b << 8) | c;
+    output += chars[(triplet >> 18) & 63];
+    output += chars[(triplet >> 12) & 63];
+    output += i + 1 < bytes.length ? chars[(triplet >> 6) & 63] : "=";
+    output += i + 2 < bytes.length ? chars[triplet & 63] : "=";
+  }
+  return output;
+}
+
+function getExportableComponents(styleId) {
+  return figma.currentPage
+    .findAll((node) => node.type === "COMPONENT" && node.getPluginData("houseUiKit") === "component")
+    .filter((node) => styleId === "all" || node.getPluginData("styleId") === styleId);
+}
+
+function getDesignSystem(styleId) {
+  const ids = styleId === "all" ? Object.keys(styles) : [styleId];
+  const result = {};
+  ids.forEach((id) => {
+    result[id] = {
+      name: styles[id].name,
+      title: styles[id].title,
+      description: styles[id].description,
+      colors: styles[id].colors,
+      sample: styles[id].sample,
+    };
+  });
+  return result;
+}
+
+async function exportSvgZip(styleId) {
+  const nodes = getExportableComponents(styleId);
+  if (nodes.length === 0) {
+    figma.ui.postMessage({
+      type: "status",
+      text: "No generated components found. Click Generate UI Kit first.",
+    });
+    return;
+  }
+
+  const files = [];
+  for (const node of nodes) {
+    const componentStyleId = node.getPluginData("styleId");
+    const exportName = node.getPluginData("exportName") || node.name.toLowerCase().replace(/\W+/g, "-");
+    const folder = styles[componentStyleId].folder;
+    const bytes = await node.exportAsync({ format: "SVG" });
+    files.push({
+      path: `${folder}/${exportName}.svg`,
+      base64: bytesToBase64(bytes),
+    });
+  }
+
+  const designSystem = JSON.stringify(getDesignSystem(styleId), null, 2);
+  files.push({
+    path: "design-system.json",
+    text: designSystem,
+  });
+
+  figma.ui.postMessage({
+    type: "export-ready",
+    text: `Exported ${nodes.length} SVG components.`,
+    filename: "house-cover-ui-kit.zip",
+    files,
+  });
 }
 
 figma.ui.onmessage = async (message) => {
@@ -232,8 +330,17 @@ figma.ui.onmessage = async (message) => {
     try {
       await createLibrary(message.styleId);
     } catch (error) {
-      figma.notify(`生成失败：${error.message}`);
-      figma.ui.postMessage({ text: `生成失败：${error.message}` });
+      figma.notify(`Generate failed: ${error.message}`);
+      figma.ui.postMessage({ type: "status", text: `Generate failed: ${error.message}` });
+    }
+  }
+
+  if (message.type === "export-svg-zip") {
+    try {
+      await exportSvgZip(message.styleId);
+    } catch (error) {
+      figma.notify(`Export failed: ${error.message}`);
+      figma.ui.postMessage({ type: "status", text: `Export failed: ${error.message}` });
     }
   }
 };

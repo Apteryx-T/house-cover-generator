@@ -54,6 +54,28 @@ const templateDefaults = {
     likes: "168",
     bottomCard: false,
   },
+  bauhausRoomTour: {
+    title: "ROOM TOUR",
+    area: "17W",
+    location: "日式中古风",
+    layout: "详解版",
+    caption: "17W日式中古风｜Room Tour 详解版",
+    account: "我的中古之家",
+    date: "2026-07-09",
+    likes: "1688",
+    bottomCard: false,
+  },
+  dutchCube: {
+    title: "世界最壮观大全",
+    area: "荷兰鹿特丹方块住宅",
+    location: "荷兰",
+    layout: "激进的住宅小区",
+    caption: "荷兰激进的住宅设计… 荷兰鹿特丹方块住宅和铅笔公寓",
+    account: "建筑师黄伟",
+    date: "2025-12-09",
+    likes: "769",
+    bottomCard: true,
+  },
 };
 
 const W = canvas.width;
@@ -435,6 +457,183 @@ function drawSunnyEstateTemplate() {
   }
 }
 
+function drawBauhausRoomTourTemplate() {
+  const title = getValue("title");
+  const middle = [getValue("area"), getValue("location")].filter(Boolean).join("");
+  const detail = getValue("layout");
+  const centerX = W / 2;
+
+  function trackedTextWidth(text, tracking) {
+    return ctx.measureText(text).width + Math.max(0, Array.from(text).length - 1) * tracking;
+  }
+
+  function drawTrackedText(text, x, y, tracking) {
+    const chars = Array.from(text);
+    let cursor = x - trackedTextWidth(text, tracking) / 2;
+    chars.forEach((char) => {
+      ctx.fillText(char, cursor, y);
+      cursor += ctx.measureText(char).width + tracking;
+    });
+  }
+
+  function fitSpecificFont(text, startSize, maxWidth, family, weight, tracking = 0) {
+    let size = startSize;
+    do {
+      ctx.font = `${weight} ${size}px ${family}`;
+      if (trackedTextWidth(text, tracking) <= maxWidth) return size;
+      size -= 2;
+    } while (size > 32);
+    return size;
+  }
+
+  ctx.save();
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  if (title) {
+    const upperTitle = title.toUpperCase();
+    const tracking = 5;
+    const titleFamily = `"Cover Optimum", "Times New Roman", serif`;
+    const titleSize = fitSpecificFont(upperTitle, 140, 918, titleFamily, 700, tracking);
+    ctx.save();
+    ctx.translate(536, 576);
+    ctx.font = `700 ${titleSize}px ${titleFamily}`;
+    ctx.fillStyle = "#173c80";
+    drawTrackedText(upperTitle, 0, 0, tracking);
+    ctx.restore();
+  }
+
+  if (middle) {
+    const middleFamily = `"Cover ShuHei", "Noto Sans SC", sans-serif`;
+    const middleSize = fitSpecificFont(middle, 92, 884, middleFamily, 700);
+    ctx.save();
+    ctx.translate(548, 758);
+    ctx.font = `700 ${middleSize}px ${middleFamily}`;
+    ctx.fillStyle = "#a8dcfa";
+    ctx.fillText(middle, 0, 0);
+    ctx.restore();
+  }
+
+  if (detail) {
+    const detailFamily = `"Cover PangMen", "Noto Sans SC", sans-serif`;
+    const detailSize = fitSpecificFont(detail, 164, 520, detailFamily, 400);
+    ctx.save();
+    ctx.translate(1000, 958);
+    ctx.font = `400 ${detailSize}px ${detailFamily}`;
+    ctx.textAlign = "right";
+    ctx.lineJoin = "miter";
+    ctx.miterLimit = 2;
+
+    ctx.fillStyle = "rgba(45,38,33,0.34)";
+    ctx.fillText(detail, 3, 4);
+    ctx.strokeStyle = "#fffdf8";
+    ctx.lineWidth = 2;
+    ctx.strokeText(detail, 0, 0);
+    ctx.fillStyle = "#fffdf8";
+    ctx.fillText(detail, 0, 0);
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+function drawDutchCubeTemplate() {
+  const topTitle = getValue("title");
+  const tag = getValue("area");
+  const location = Array.from(getValue("location"));
+  const headline = Array.from(getValue("layout"));
+  const splitAt = Math.min(3, headline.length);
+  const headlineLine1 = headline.slice(0, splitAt).join("");
+  const headlineLine2 = headline.slice(splitAt).join("");
+  const white = "#fffef9";
+  const yellow = "#efb31a";
+
+  function fitDutchFont(text, startSize, maxWidth, family, weight) {
+    let size = startSize;
+    do {
+      ctx.font = `${weight} ${size}px ${family}`;
+      if (ctx.measureText(text).width <= maxWidth) return size;
+      size -= 2;
+    } while (size > 30);
+    return size;
+  }
+
+  ctx.save();
+  ctx.textBaseline = "alphabetic";
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  if (topTitle) {
+    const family = `"Cover PangMen", "Noto Sans SC", sans-serif`;
+    const size = fitDutchFont(topTitle, 116, 1000, family, 400);
+    ctx.font = `400 ${size}px ${family}`;
+    ctx.textAlign = "center";
+    ctx.lineJoin = "miter";
+    ctx.fillStyle = "rgba(41,47,53,0.42)";
+    ctx.fillText(topTitle, 544, 151);
+    ctx.fillStyle = white;
+    ctx.fillText(topTitle, 536, 143);
+  }
+
+  ctx.strokeStyle = "rgba(255,255,255,0.96)";
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(60, 170);
+  ctx.lineTo(1022, 170);
+  ctx.stroke();
+
+  if (tag) {
+    const family = `"Noto Sans SC", "Microsoft YaHei", sans-serif`;
+    const size = fitDutchFont(tag, 54, 568, family, 900);
+    ctx.font = `900 ${size}px ${family}`;
+    const tagWidth = Math.max(590, ctx.measureText(tag).width + 58);
+    ctx.fillStyle = "rgba(4,5,6,0.96)";
+    ctx.beginPath();
+    ctx.roundRect(126, 372, tagWidth, 92, 42);
+    ctx.fill();
+    ctx.fillStyle = white;
+    ctx.textAlign = "left";
+    ctx.fillText(tag, 153, 438);
+  }
+
+  if (location.length) {
+    const family = `"Cover ShuHei", "Noto Sans SC", sans-serif`;
+    ctx.font = `700 98px ${family}`;
+    ctx.textAlign = "center";
+    ctx.fillStyle = white;
+    location.slice(0, 2).forEach((char, index) => {
+      ctx.fillText(char, 203, 580 + index * 104);
+    });
+
+  }
+
+  function drawHeadlineLine(text, x, y, maxWidth, accentFirst) {
+    if (!text) return;
+    const family = `"Cover ShuHei", "Noto Sans SC", sans-serif`;
+    const size = fitDutchFont(text, 170, maxWidth, family, 700);
+    ctx.font = `700 ${size}px ${family}`;
+    ctx.textAlign = "left";
+    ctx.lineJoin = "miter";
+    ctx.miterLimit = 2;
+
+    ctx.fillStyle = "rgba(172,114,0,0.7)";
+    ctx.fillText(text, x + 10, y + 11);
+
+    let cursor = x;
+    Array.from(text).forEach((char, index) => {
+      ctx.fillStyle = accentFirst && index === 0 ? yellow : white;
+      ctx.fillText(char, cursor, y);
+      cursor += ctx.measureText(char).width;
+    });
+  }
+
+  drawHeadlineLine(headlineLine1, 132, 860, 850, true);
+  drawHeadlineLine(headlineLine2, 132, 1055, 860, false);
+  ctx.restore();
+}
+
 function drawAvatar(x, y, r) {
   const grd = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
   grd.addColorStop(0, "#ffc936");
@@ -536,6 +735,10 @@ function render() {
     drawVarietyVisitTemplate();
   } else if (templateId === "sunnyEstate") {
     drawSunnyEstateTemplate();
+  } else if (templateId === "bauhausRoomTour") {
+    drawBauhausRoomTourTemplate();
+  } else if (templateId === "dutchCube") {
+    drawDutchCubeTemplate();
   } else {
     drawEstateBoldTemplate();
   }
@@ -580,3 +783,15 @@ refs.download.addEventListener("click", () => {
 });
 
 render();
+
+async function loadCoverFonts() {
+  if (!document.fonts?.load) return;
+  await Promise.all([
+    document.fonts.load('700 150px "Cover Optimum"', "ROOM TOUR"),
+    document.fonts.load('700 110px "Cover ShuHei"', "17W日式中古风"),
+    document.fonts.load('400 180px "Cover PangMen"', "详解版"),
+  ]);
+  render();
+}
+
+loadCoverFonts();
