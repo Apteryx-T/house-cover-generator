@@ -43,6 +43,17 @@ const templateDefaults = {
     likes: "219",
     bottomCard: true,
   },
+  sunnyEstate: {
+    title: "市委家属院",
+    area: "#6层板楼带电梯",
+    location: "3个阳台#",
+    layout: "",
+    caption: "市委家属院｜板楼带电梯｜三个阳台采光好",
+    account: "城市好房",
+    date: "2026-07-09",
+    likes: "168",
+    bottomCard: false,
+  },
 };
 
 const W = canvas.width;
@@ -210,6 +221,36 @@ function comicStrokeText(text, x, y, size, fill, options = {}) {
   ctx.restore();
 }
 
+function layeredEstateText(text, x, y, size, options = {}) {
+  const {
+    align = "center",
+    weight = 900,
+    fill = "#fffdf7",
+    outline = "#3b4146",
+    outlineWidth = Math.max(8, size * 0.075),
+  } = options;
+
+  ctx.save();
+  ctx.font = font(size, weight);
+  ctx.textAlign = align;
+  ctx.textBaseline = "alphabetic";
+  ctx.lineJoin = "round";
+  ctx.miterLimit = 1.5;
+  ctx.shadowColor = "rgba(0,0,0,0.18)";
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = Math.max(2, size * 0.018);
+  ctx.shadowOffsetY = Math.max(3, size * 0.026);
+
+  ctx.strokeStyle = outline;
+  ctx.lineWidth = outlineWidth;
+  ctx.strokeText(text, x, y);
+
+  ctx.shadowColor = "transparent";
+  ctx.fillStyle = fill;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
 function drawTopCopy() {
   const title = getValue("title");
   const area = getValue("area");
@@ -359,6 +400,41 @@ function drawVarietyVisitTemplate() {
   }
 }
 
+function drawSunnyEstateTemplate() {
+  const title = getValue("title");
+  const detail = [getValue("area"), getValue("location"), getValue("layout")]
+    .filter(Boolean)
+    .join(" ");
+
+  const warmth = ctx.createLinearGradient(0, 0, 0, H);
+  warmth.addColorStop(0, "rgba(255,210,112,0.16)");
+  warmth.addColorStop(0.56, "rgba(255,191,74,0.08)");
+  warmth.addColorStop(1, "rgba(255,171,35,0.13)");
+  ctx.fillStyle = warmth;
+  ctx.fillRect(0, 0, W, H);
+
+  const topGlow = ctx.createLinearGradient(0, 0, 0, 560);
+  topGlow.addColorStop(0, "rgba(255,248,224,0.34)");
+  topGlow.addColorStop(0.58, "rgba(255,248,224,0.12)");
+  topGlow.addColorStop(1, "rgba(255,248,224,0)");
+  ctx.fillStyle = topGlow;
+  ctx.fillRect(0, 0, W, 560);
+
+  if (title) {
+    const titleSize = fitFontSize(title, 176, W - 58);
+    layeredEstateText(title, W / 2, 292, titleSize, {
+      outlineWidth: Math.max(12, titleSize * 0.075),
+    });
+  }
+
+  if (detail) {
+    const detailSize = fitFontSize(detail, 80, W - 48, 900);
+    layeredEstateText(detail, W / 2, 414, detailSize, {
+      outlineWidth: Math.max(7, detailSize * 0.07),
+    });
+  }
+}
+
 function drawAvatar(x, y, r) {
   const grd = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
   grd.addColorStop(0, "#ffc936");
@@ -445,15 +521,27 @@ function drawBottomCard() {
 
 function render() {
   ctx.clearRect(0, 0, W, H);
+  const templateId = getTemplateId();
+
+  ctx.save();
+  if (templateId === "sunnyEstate") {
+    ctx.beginPath();
+    ctx.roundRect(0, 0, W, H, 58);
+    ctx.clip();
+  }
+
   drawCoverImage();
 
-  if (getTemplateId() === "varietyVisit") {
+  if (templateId === "varietyVisit") {
     drawVarietyVisitTemplate();
+  } else if (templateId === "sunnyEstate") {
+    drawSunnyEstateTemplate();
   } else {
     drawEstateBoldTemplate();
   }
 
   drawBottomCard();
+  ctx.restore();
 }
 
 function loadImage(file) {
