@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>房源封面生成器</title>
+    <link rel="stylesheet" href="styles.css?v=23" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace" aria-label="封面预览">
+        <div class="canvas-wrap">
+          <canvas id="coverCanvas" width="1080" height="1440"></canvas>
+        </div>
+      </section>
+
+      <aside class="panel" aria-label="封面参数">
+        <div class="panel-heading">
+          <h1>封面生成</h1>
+          <button id="downloadBtn" class="primary-btn" type="button">下载封面</button>
+        </div>
+
+        <label class="file-picker">
+          <input id="imageInput" type="file" accept="image/*" />
+          <span>上传图片</span>
+        </label>
+
+        <div class="field-grid">
+          <label>
+            <span>风格</span>
+            <select id="templateSelect">
+              <option value="estateBold">房源大字版</option>
+              <option value="varietyVisit">探家综艺版</option>
+              <option value="sunnyEstate">阳光房产标题版</option>
+              <option value="bauhausRoomTour">包豪斯 Room Tour</option>
+              <option value="dutchCube">荷兰建筑杂志版</option>
+              <option value="cuteCarousel">中文手写小清新版</option>
+            </select>
+          </label>
+
+          <label>
+            <span>主标题</span>
+            <input id="titleInput" type="text" value="北京国贸" />
+          </label>
+
+          <label>
+            <span>大标题/面积</span>
+            <input id="areaInput" type="text" value="78平" />
+          </label>
+
+          <label>
+            <span>小标签/地段</span>
+            <input id="locationInput" type="text" value="CBD核心区  东三环" />
+          </label>
+
+          <label>
+            <span>副标题/户型</span>
+            <input id="layoutInput" type="text" value="一室一厅一卫" />
+          </label>
+
+        </div>
+
+      </aside>
+    </main>
+
+    <script src="app.js?v=28"></script>
+  </body>
+</html>

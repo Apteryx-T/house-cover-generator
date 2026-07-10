@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f7f8;
+        --panel: #ffffff;
+        --text: #18191f;
+        --muted: #666b76;
+        --line: #d8dbe2;
+        --accent: #f4b000;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 18px;
+        font-family: Inter, Arial, sans-serif;
+        color: var(--text);
+        background: var(--bg);
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        line-height: 1.25;
+      }
+
+      p {
+        margin: 0 0 16px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .card {
+        display: grid;
+        gap: 12px;
+        padding: 14px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      label {
+        display: grid;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      select,
+      button {
+        min-height: 40px;
+        border-radius: 6px;
+        font: inherit;
+      }
+
+      select {
+        width: 100%;
+        padding: 0 10px;
+        color: var(--text);
+        background: #fff;
+        border: 1px solid var(--line);
+      }
+
+      button {
+        border: 0;
+        color: #16120a;
+        font-weight: 800;
+        background: linear-gradient(180deg, #ffd45a, var(--accent));
+        cursor: pointer;
+      }
+
+      .secondary {
+        color: var(--text);
+        background: #edf0f5;
+      }
+
+      .status {
+        min-height: 20px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .download {
+        display: none;
+        min-height: 40px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        background: #18191f;
+      }
+
+      .download.is-visible {
+        display: flex;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>House Video UI Kit</h1>
+    <p>Generate Figma components, then export the generated UI as an SVG zip package.</p>
+
+    <div class="card">
+      <label>
+        Scope
+        <select id="styleSelect">
+          <option value="all">All styles</option>
+          <option value="estateBold">Estate Bold</option>
+          <option value="varietyVisit">Variety Visit</option>
+        </select>
+      </label>
+
+      <button id="createBtn" type="button">Generate UI Kit</button>
+      <button id="exportBtn" type="button">Export SVG Zip</button>
+      <a id="downloadLink" class="download" download="house-cover-ui-kit.zip">Download Zip</a>
+      <button id="closeBtn" class="secondary" type="button">Close</button>
+      <div id="status" class="status"></div>
+    </div>
+
+    <script>
+      const statusEl = document.getElementById("status");
+      const downloadLink = document.getElementById("downloadLink");
+
+      function setStatus(text) {
+        statusEl.textContent = text || "";
+      }
+
+      function post(type) {
+        downloadLink.classList.remove("is-visible");
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type,
+              styleId: document.getElementById("styleSelect").value,
+            },
+          },
+          "*"
+        );
+      }
+
+      document.getElementById("createBtn").onclick = () => {
+        setStatus("Generating UI kit...");
+        post("create-library");
+      };
+
+      document.getElementById("exportBtn").onclick = () => {
+        setStatus("Exporting SVG zip...");
+        post("export-svg-zip");
+      };
+
+      document.getElementById("closeBtn").onclick = () => {
+        parent.postMessage({ pluginMessage: { type: "close" } }, "*");
+      };
+
+      function crc32(bytes) {
+        let crc = -1;
+        for (let i = 0; i < bytes.length; i += 1) {
+          crc ^= bytes[i];
+          for (let j = 0; j < 8; j += 1) {
+            crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
+          }
+        }
+        return (crc ^ -1) >>> 0;
+      }
+
+      function writeUint16(output, value) {
+        output.push(value & 255, (value >>> 8) & 255);
+      }
+
+      function writeUint32(output, value) {
+        output.push(value & 255, (value >>> 8) & 255, (value >>> 16) & 255, (value >>> 24) & 255);
+      }
+
+      function base64ToBytes(base64) {
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i += 1) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+        return bytes;
+      }
+
+      function makeZip(files) {
+        const encoder = new TextEncoder();
+        const output = [];
+        const central = [];
+        let offset = 0;
+
+        files.forEach((file) => {
+          const nameBytes = encoder.encode(file.path);
+          const dataBytes = file.base64 ? base64ToBytes(file.base64) : encoder.encode(file.text || "");
+          const crc = crc32(dataBytes);
+
+          const local = [];
+          writeUint32(local, 0x04034b50);
+          writeUint16(local, 20);
+          writeUint16(local, 0);
+          writeUint16(local, 0);
+          writeUint16(local, 0);
+          writeUint16(local, 0);
+          writeUint32(local, crc);
+          writeUint32(local, dataBytes.length);
+          writeUint32(local, dataBytes.length);
+          writeUint16(local, nameBytes.length);
+          writeUint16(local, 0);
+
+          output.push(...local, ...nameBytes, ...dataBytes);
+
+          const record = [];
+          writeUint32(record, 0x02014b50);
+          writeUint16(record, 20);
+          writeUint16(record, 20);
+          writeUint16(record, 0);
+          writeUint16(record, 0);
+          writeUint16(record, 0);
+          writeUint16(record, 0);
+          writeUint32(record, crc);
+          writeUint32(record, dataBytes.length);
+          writeUint32(record, dataBytes.length);
+          writeUint16(record, nameBytes.length);
+          writeUint16(record, 0);
+          writeUint16(record, 0);
+          writeUint16(record, 0);
+          writeUint16(record, 0);
+          writeUint32(record, 0);
+          writeUint32(record, offset);
+          central.push(...record, ...nameBytes);
+
+          offset = output.length;
+        });
+
+        const centralOffset = output.length;
+        output.push(...central);
+        const centralSize = output.length - centralOffset;
+
+        writeUint32(output, 0x06054b50);
+        writeUint16(output, 0);
+        writeUint16(output, 0);
+        writeUint16(output, files.length);
+        writeUint16(output, files.length);
+        writeUint32(output, centralSize);
+        writeUint32(output, centralOffset);
+        writeUint16(output, 0);
+
+        return new Blob([new Uint8Array(output)], { type: "application/zip" });
+      }
+
+      window.onmessage = (event) => {
+        const message = event.data.pluginMessage;
+        if (!message) return;
+
+        if (message.type === "status") {
+          setStatus(message.text);
+          return;
+        }
+
+        if (message.type === "export-ready") {
+          const blob = makeZip(message.files);
+          const url = URL.createObjectURL(blob);
+          downloadLink.href = url;
+          downloadLink.download = message.filename || "house-cover-ui-kit.zip";
+          downloadLink.classList.add("is-visible");
+          setStatus(`${message.text} Click Download Zip.`);
+        }
+      };
+    </script>
+  </body>
+</html>
