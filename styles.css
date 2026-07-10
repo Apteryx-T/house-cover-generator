@@ -154,9 +154,9 @@ select {
 .canvas-wrap {
   display: grid;
   place-items: center;
-  width: min(100%, 68vh);
+  width: min(100%, 58vh);
   max-width: 560px;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 9 / 16;
   background: #15171c;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
 }
