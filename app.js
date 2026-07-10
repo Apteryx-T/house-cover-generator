@@ -91,6 +91,7 @@ const templateDefaults = {
 
 const W = canvas.width;
 const H = canvas.height;
+const SAFE_TOP = 250;
 const YELLOW = "#f5ad00";
 const WHITE = "#ffffff";
 const DARK = "#111217";
@@ -290,7 +291,7 @@ function drawTopCopy() {
 
   if (title) {
     const titleSize = fitFontSize(title, 152, W - 70);
-    strokeFillText(title, 28, 205, titleSize, WHITE, {
+    strokeFillText(title, 28, 205 + SAFE_TOP, titleSize, WHITE, {
       strokeWidth: 14,
       shadow: true,
     });
@@ -298,7 +299,7 @@ function drawTopCopy() {
 
   if (area) {
     const areaSize = fitFontSize(area, 216, W - 160);
-    strokeFillText(area, W - 32, 390, areaSize, YELLOW, {
+    strokeFillText(area, W - 32, 390 + SAFE_TOP, areaSize, YELLOW, {
       align: "right",
       strokeWidth: 16,
       shadow: true,
@@ -309,7 +310,7 @@ function drawTopCopy() {
 function drawMiddleCopy() {
   const location = getValue("location");
   const layout = getValue("layout");
-  const baseY = H - 612;
+  const baseY = H - 642 + SAFE_TOP;
 
   if (location) {
     const locationSize = fitFontSize(location, 78, W - 34);
@@ -365,7 +366,7 @@ function drawVarietyVisitTemplate() {
 
     chars.forEach((char, index) => {
       const [x, y, size, angle] = positions[index];
-      comicStrokeText(char, x, y, size, WHITE, {
+      comicStrokeText(char, x, y + SAFE_TOP, size, WHITE, {
         angle,
         outer: "rgba(0,0,0,0.42)",
         middle: "#77746f",
@@ -383,7 +384,7 @@ function drawVarietyVisitTemplate() {
   if (tag) {
     const tagLines = tag.split("｜").slice(0, 2);
     tagLines.forEach((line, index) => {
-      comicStrokeText(line, 88, 1000 + index * 58, 43, WHITE, {
+      comicStrokeText(line, 88, 1000 + SAFE_TOP + index * 58, 43, WHITE, {
         stroke: "rgba(56,37,28,0.9)",
         outer: "rgba(35,24,20,0.36)",
         middle: "rgba(72,48,38,0.9)",
@@ -400,7 +401,7 @@ function drawVarietyVisitTemplate() {
 
   if (main) {
     const mainSize = fitFontSize(main, 120, W - 28);
-    comicStrokeText(main, W / 2, 1196, mainSize, "#d65b99", {
+    comicStrokeText(main, W / 2, 1196 + SAFE_TOP, mainSize, "#d65b99", {
       align: "center",
       outer: "rgba(136,54,91,0.38)",
       middle: WHITE,
@@ -417,7 +418,7 @@ function drawVarietyVisitTemplate() {
 
   if (question) {
     const questionSize = fitFontSize(question, 164, W - 92);
-    comicStrokeText(question, W / 2, 1374, questionSize, WHITE, {
+    comicStrokeText(question, W / 2, 1374 + SAFE_TOP, questionSize, WHITE, {
       align: "center",
       outer: "rgba(115,74,47,0.36)",
       middle: "#a07754",
@@ -455,14 +456,14 @@ function drawSunnyEstateTemplate() {
 
   if (title) {
     const titleSize = fitFontSize(title, 176, W - 58);
-    layeredEstateText(title, W / 2, 292, titleSize, {
+    layeredEstateText(title, W / 2, 292 + SAFE_TOP, titleSize, {
       outlineWidth: Math.max(12, titleSize * 0.075),
     });
   }
 
   if (detail) {
     const detailSize = fitFontSize(detail, 80, W - 48, 900);
-    layeredEstateText(detail, W / 2, 414, detailSize, {
+    layeredEstateText(detail, W / 2, 414 + SAFE_TOP, detailSize, {
       outlineWidth: Math.max(7, detailSize * 0.07),
     });
   }
@@ -509,7 +510,7 @@ function drawBauhausRoomTourTemplate() {
     const titleFamily = `"Cover Optimum", "Times New Roman", serif`;
     const titleSize = fitSpecificFont(upperTitle, 140, 918, titleFamily, 700, tracking);
     ctx.save();
-    ctx.translate(536, 576);
+    ctx.translate(536, 576 + SAFE_TOP);
     ctx.font = `700 ${titleSize}px ${titleFamily}`;
     ctx.fillStyle = "#173c80";
     drawTrackedText(upperTitle, 0, 0, tracking);
@@ -520,7 +521,7 @@ function drawBauhausRoomTourTemplate() {
     const middleFamily = `"Cover ShuHei", "Noto Sans SC", sans-serif`;
     const middleSize = fitSpecificFont(middle, 92, 884, middleFamily, 700);
     ctx.save();
-    ctx.translate(548, 758);
+    ctx.translate(548, 758 + SAFE_TOP);
     ctx.font = `700 ${middleSize}px ${middleFamily}`;
     ctx.fillStyle = "#a8dcfa";
     ctx.fillText(middle, 0, 0);
@@ -531,7 +532,7 @@ function drawBauhausRoomTourTemplate() {
     const detailFamily = `"Cover PangMen", "Noto Sans SC", sans-serif`;
     const detailSize = fitSpecificFont(detail, 164, 520, detailFamily, 400);
     ctx.save();
-    ctx.translate(1000, 958);
+    ctx.translate(1000, 958 + SAFE_TOP);
     ctx.font = `400 ${detailSize}px ${detailFamily}`;
     ctx.textAlign = "right";
     ctx.lineJoin = "miter";
@@ -583,16 +584,16 @@ function drawDutchCubeTemplate() {
     ctx.textAlign = "center";
     ctx.lineJoin = "miter";
     ctx.fillStyle = "rgba(41,47,53,0.42)";
-    ctx.fillText(topTitle, 544, 151);
+    ctx.fillText(topTitle, 544, 151 + SAFE_TOP);
     ctx.fillStyle = white;
-    ctx.fillText(topTitle, 536, 143);
+    ctx.fillText(topTitle, 536, 143 + SAFE_TOP);
   }
 
   ctx.strokeStyle = "rgba(255,255,255,0.96)";
   ctx.lineWidth = 5;
   ctx.beginPath();
-  ctx.moveTo(60, 170);
-  ctx.lineTo(1022, 170);
+  ctx.moveTo(60, 170 + SAFE_TOP);
+  ctx.lineTo(1022, 170 + SAFE_TOP);
   ctx.stroke();
 
   if (tag) {
@@ -602,11 +603,11 @@ function drawDutchCubeTemplate() {
     const tagWidth = Math.max(590, ctx.measureText(tag).width + 58);
     ctx.fillStyle = "rgba(4,5,6,0.96)";
     ctx.beginPath();
-    ctx.roundRect(126, 372, tagWidth, 92, 42);
+    ctx.roundRect(126, 372 + SAFE_TOP, tagWidth, 92, 42);
     ctx.fill();
     ctx.fillStyle = white;
     ctx.textAlign = "left";
-    ctx.fillText(tag, 153, 438);
+    ctx.fillText(tag, 153, 438 + SAFE_TOP);
   }
 
   if (location.length) {
@@ -615,7 +616,7 @@ function drawDutchCubeTemplate() {
     ctx.textAlign = "center";
     ctx.fillStyle = white;
     location.slice(0, 2).forEach((char, index) => {
-      ctx.fillText(char, 203, 580 + index * 104);
+      ctx.fillText(char, 203, 580 + SAFE_TOP + index * 104);
     });
 
   }
@@ -640,8 +641,8 @@ function drawDutchCubeTemplate() {
     });
   }
 
-  drawHeadlineLine(headlineLine1, 132, 860, 850, true);
-  drawHeadlineLine(headlineLine2, 132, 1055, 860, false);
+  drawHeadlineLine(headlineLine1, 132, 860 + SAFE_TOP, 850, true);
+  drawHeadlineLine(headlineLine2, 132, 1055 + SAFE_TOP, 860, false);
   ctx.restore();
 }
 
@@ -747,16 +748,16 @@ function drawCuteCarouselTemplate() {
   ctx.fillStyle = vignette;
   ctx.fillRect(0, 0, W, H);
 
-  drawCuteLine(eyebrow, W / 2, 292, 84, 760, 4);
-  drawCuteLine(main, W / 2, 486, 142, 820, 6);
-  drawCuteLine(sub, W / 2, 666, 118, 800, 6);
+  drawCuteLine(eyebrow, W / 2, 292 + SAFE_TOP, 84, 760, 4);
+  drawCuteLine(main, W / 2, 486 + SAFE_TOP, 142, 820, 6);
+  drawCuteLine(sub, W / 2, 666 + SAFE_TOP, 118, 800, 6);
 
-  drawSmallCross(398, 842, 15, 42);
-  drawSparkle(512, 784, 30, 8);
-  drawSparkle(436, 908, 20, -12);
-  drawSmallCross(362, 1002, 9, 34);
-  drawSparkle(316, 1068, 9, 0);
-  drawSparkle(464, 1052, 12, 10);
+  drawSmallCross(398, 842 + SAFE_TOP, 15, 42);
+  drawSparkle(512, 784 + SAFE_TOP, 30, 8);
+  drawSparkle(436, 908 + SAFE_TOP, 20, -12);
+  drawSmallCross(362, 1002 + SAFE_TOP, 9, 34);
+  drawSparkle(316, 1068 + SAFE_TOP, 9, 0);
+  drawSparkle(464, 1052 + SAFE_TOP, 12, 10);
   ctx.restore();
 }
 
