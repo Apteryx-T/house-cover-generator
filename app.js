@@ -76,6 +76,17 @@ const templateDefaults = {
     likes: "769",
     bottomCard: true,
   },
+  cuteCarousel: {
+    title: "小白也能懂的",
+    area: "可爱轮播图",
+    location: "动画教程",
+    layout: "",
+    caption: "小清新轮播图动画教程",
+    account: "设计小笔记",
+    date: "2026-07-10",
+    likes: "520",
+    bottomCard: false,
+  },
 };
 
 const W = canvas.width;
@@ -634,6 +645,121 @@ function drawDutchCubeTemplate() {
   ctx.restore();
 }
 
+function drawCuteCarouselTemplate() {
+  const eyebrow = getValue("title");
+  const main = getValue("area");
+  const sub = getValue("location");
+  const white = "#fffdf8";
+  const family = `"Cover StarPanda", "Cover Xiaolai", "Microsoft YaHei", sans-serif`;
+
+  function fitCuteFont(text, startSize, maxWidth, tracking = 0) {
+    let size = startSize;
+    do {
+      ctx.font = `400 ${size}px ${family}`;
+      const width = ctx.measureText(text).width + Math.max(0, Array.from(text).length - 1) * tracking;
+      if (width <= maxWidth) return size;
+      size -= 2;
+    } while (size > 28);
+    return size;
+  }
+
+  function trackedTextWidth(text, tracking) {
+    return ctx.measureText(text).width + Math.max(0, Array.from(text).length - 1) * tracking;
+  }
+
+  function drawTrackedFill(text, x, y, size, tracking = 0) {
+    const chars = Array.from(text);
+    ctx.font = `400 ${size}px ${family}`;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
+    let cursor = x - trackedTextWidth(text, tracking) / 2;
+    chars.forEach((char) => {
+      ctx.fillText(char, cursor, y);
+      cursor += ctx.measureText(char).width + tracking;
+    });
+  }
+
+  function drawCuteLine(text, x, y, startSize, maxWidth, tracking = 0) {
+    if (!text) return;
+    const size = fitCuteFont(text, startSize, maxWidth, tracking);
+    ctx.save();
+    ctx.lineJoin = "round";
+    ctx.miterLimit = 2;
+    ctx.shadowColor = "rgba(0,0,0,0.24)";
+    ctx.shadowBlur = 1;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 3;
+    ctx.strokeStyle = "rgba(255,255,255,0.72)";
+    ctx.lineWidth = Math.max(1.5, size * 0.012);
+    ctx.font = `400 ${size}px ${family}`;
+    ctx.textAlign = "center";
+    ctx.strokeText(text, x, y);
+    ctx.fillStyle = white;
+    drawTrackedFill(text, x, y, size, tracking);
+    ctx.restore();
+  }
+
+  function drawSparkle(x, y, r, angle = 0) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate((angle * Math.PI) / 180);
+    ctx.fillStyle = white;
+    ctx.beginPath();
+    ctx.moveTo(0, -r);
+    ctx.quadraticCurveTo(r * 0.18, -r * 0.18, r, 0);
+    ctx.quadraticCurveTo(r * 0.18, r * 0.18, 0, r);
+    ctx.quadraticCurveTo(-r * 0.18, r * 0.18, -r, 0);
+    ctx.quadraticCurveTo(-r * 0.18, -r * 0.18, 0, -r);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawSmallCross(x, y, r, angle = 0) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate((angle * Math.PI) / 180);
+    ctx.strokeStyle = white;
+    ctx.lineWidth = Math.max(5, r * 0.32);
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(-r, 0);
+    ctx.lineTo(r, 0);
+    ctx.moveTo(0, -r);
+    ctx.lineTo(0, r);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  const dark = ctx.createLinearGradient(0, 0, 0, H);
+  dark.addColorStop(0, "rgba(0,0,0,0.30)");
+  dark.addColorStop(0.42, "rgba(0,0,0,0.22)");
+  dark.addColorStop(1, "rgba(0,0,0,0.06)");
+  ctx.fillStyle = dark;
+  ctx.fillRect(0, 0, W, H);
+
+  const vignette = ctx.createRadialGradient(W / 2, 720, 120, W / 2, 760, 940);
+  vignette.addColorStop(0, "rgba(0,0,0,0)");
+  vignette.addColorStop(1, "rgba(0,0,0,0.30)");
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, W, H);
+
+  drawCuteLine(eyebrow, W / 2, 292, 84, 760, 4);
+  drawCuteLine(main, W / 2, 486, 142, 820, 6);
+  drawCuteLine(sub, W / 2, 666, 118, 800, 6);
+
+  drawSmallCross(398, 842, 15, 42);
+  drawSparkle(512, 784, 30, 8);
+  drawSparkle(436, 908, 20, -12);
+  drawSmallCross(362, 1002, 9, 34);
+  drawSparkle(316, 1068, 9, 0);
+  drawSparkle(464, 1052, 12, 10);
+  ctx.restore();
+}
+
 function drawAvatar(x, y, r) {
   const grd = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
   grd.addColorStop(0, "#ffc936");
@@ -739,6 +865,8 @@ function render() {
     drawBauhausRoomTourTemplate();
   } else if (templateId === "dutchCube") {
     drawDutchCubeTemplate();
+  } else if (templateId === "cuteCarousel") {
+    drawCuteCarouselTemplate();
   } else {
     drawEstateBoldTemplate();
   }
@@ -790,6 +918,9 @@ async function loadCoverFonts() {
     document.fonts.load('700 150px "Cover Optimum"', "ROOM TOUR"),
     document.fonts.load('700 110px "Cover ShuHei"', "17W日式中古风"),
     document.fonts.load('400 180px "Cover PangMen"', "详解版"),
+    document.fonts.load('400 140px "Cover Poetsen"', "CAROUSEL"),
+    document.fonts.load('400 150px "Cover StarPanda"', "可爱轮播图"),
+    document.fonts.load('400 110px "Cover Xiaolai"', "动画教程"),
   ]);
   render();
 }

@@ -78,6 +78,30 @@
   font-display: block;
 }
 
+@font-face {
+  font-family: "Cover Poetsen";
+  src: url("fonts/PoetsenOne.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Cover StarPanda";
+  src: url("fonts/StarPandaKids.otf") format("opentype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Cover Xiaolai";
+  src: url("fonts/Xiaolai-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
+
 :root {
   color-scheme: dark;
   --bg: #101115;
