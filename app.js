@@ -82,6 +82,30 @@ const templateDefaults = {
     likes: "520",
     bottomCard: false,
   },
+  comicLivingRoom: {
+    title: "哇塞！",
+    area: "这个客厅也太大了吧！",
+    location: "270㎡大平层 · 南北通透",
+    layout: "南向采光｜双阳台｜近地铁",
+  },
+  smartHomeBlocks: {
+    title: "当房子变成",
+    area: "懂你的家",
+    location: "智慧型家装",
+    layout: "深入你的生活方式",
+  },
+  editorialDay: {
+    title: "A TIMESTAMPED",
+    area: "DAY IN｜MY LIFE",
+    location: "AS A HOME DESIGNER",
+    layout: "ROOM TOUR · 2026",
+  },
+  viralRoast: {
+    title: "为什么爆火的",
+    area: "第四代住宅",
+    location: "被全网吐槽",
+    layout: "是坑？",
+  },
 };
 
 const W = canvas.width;
@@ -748,6 +772,418 @@ function drawCuteCarouselTemplate() {
   ctx.restore();
 }
 
+function drawComicLivingRoomTemplate() {
+  const kicker = getValue("title");
+  const headline = getValue("area");
+  const info = getValue("location");
+  const features = getValue("layout")
+    .split(/[｜|、，,]+/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 3);
+  const family = `"Cover ShuHei", "Cover Zcool Cool Black", "Microsoft YaHei", sans-serif`;
+
+  function fitComicFont(text, startSize, maxWidth) {
+    let size = startSize;
+    do {
+      ctx.font = `700 ${size}px ${family}`;
+      if (ctx.measureText(text).width <= maxWidth) return size;
+      size -= 3;
+    } while (size > 38);
+    return size;
+  }
+
+  function comicText(text, x, y, startSize, maxWidth, fill, angle = 0, align = "center") {
+    if (!text) return;
+    const size = fitComicFont(text, startSize, maxWidth);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate((angle * Math.PI) / 180);
+    ctx.font = `700 ${size}px ${family}`;
+    ctx.textAlign = align;
+    ctx.textBaseline = "alphabetic";
+    ctx.lineJoin = "round";
+    ctx.shadowColor = "rgba(0,0,0,0.9)";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 10;
+    ctx.shadowOffsetY = 12;
+    ctx.strokeStyle = "#050505";
+    ctx.lineWidth = Math.max(14, size * 0.105);
+    ctx.strokeText(text, 0, 0);
+    ctx.fillStyle = fill;
+    ctx.fillText(text, 0, 0);
+    ctx.restore();
+  }
+
+  function burstPath(x, y, width, height) {
+    const points = [
+      [0.04, 0.16], [0.12, 0.14], [0.10, 0.06], [0.22, 0.10], [0.29, 0.02],
+      [0.39, 0.09], [0.50, 0.00], [0.58, 0.09], [0.70, 0.03], [0.76, 0.13],
+      [0.91, 0.08], [0.89, 0.21], [0.99, 0.27], [0.93, 0.38], [1.00, 0.48],
+      [0.92, 0.57], [0.98, 0.70], [0.88, 0.74], [0.92, 0.88], [0.78, 0.85],
+      [0.69, 0.98], [0.58, 0.89], [0.48, 1.00], [0.39, 0.89], [0.26, 0.97],
+      [0.21, 0.84], [0.07, 0.89], [0.11, 0.73], [0.01, 0.67], [0.08, 0.55],
+      [0.00, 0.44], [0.09, 0.35], [0.01, 0.27],
+    ];
+    ctx.beginPath();
+    points.forEach(([px, py], index) => {
+      const pointX = x + px * width;
+      const pointY = y + py * height;
+      if (index === 0) ctx.moveTo(pointX, pointY);
+      else ctx.lineTo(pointX, pointY);
+    });
+    ctx.closePath();
+  }
+
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  const edgeWash = ctx.createRadialGradient(W / 2, 780, 260, W / 2, 780, 980);
+  edgeWash.addColorStop(0, "rgba(255,255,255,0)");
+  edgeWash.addColorStop(0.72, "rgba(255,255,255,0.05)");
+  edgeWash.addColorStop(1, "rgba(255,255,255,0.68)");
+  ctx.fillStyle = edgeWash;
+  ctx.fillRect(0, 0, W, 1500);
+
+  ctx.strokeStyle = "rgba(10,10,10,0.72)";
+  ctx.lineWidth = 5;
+  ctx.lineCap = "round";
+  const lineYs = [90, 155, 230, 315, 410, 520, 640, 770, 900, 1040, 1180, 1320];
+  lineYs.forEach((lineY, index) => {
+    const inset = 58 + (index % 4) * 19;
+    ctx.beginPath();
+    ctx.moveTo(0, lineY - 72);
+    ctx.lineTo(inset, lineY);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(W, lineY - 88);
+    ctx.lineTo(W - inset, lineY + 5);
+    ctx.stroke();
+  });
+
+  burstPath(58, 150, 964, 980);
+  ctx.fillStyle = "rgba(255,255,255,0.96)";
+  ctx.fill();
+  ctx.strokeStyle = "#090909";
+  ctx.lineWidth = 9;
+  ctx.lineJoin = "round";
+  ctx.stroke();
+
+  comicText(kicker, 300, 430, 185, 470, "#ffe21b", -3);
+
+  const chars = Array.from(headline);
+  const splitAt = Math.max(1, Math.ceil(chars.length / 2));
+  const firstLine = chars.slice(0, splitAt).join("");
+  const secondLine = chars.slice(splitAt).join("");
+  comicText(firstLine, W / 2, 670, 158, 820, "#ff8514", 1);
+  comicText(secondLine, W / 2, 875, 172, 840, "#ff9d12", -1);
+
+  if (info) {
+    const infoSize = fitComicFont(info, 61, 800);
+    ctx.save();
+    ctx.translate(W / 2, 1005);
+    ctx.rotate((-2 * Math.PI) / 180);
+    ctx.font = `700 ${infoSize}px "Microsoft YaHei", sans-serif`;
+    const infoWidth = Math.min(890, ctx.measureText(info).width + 70);
+    ctx.fillStyle = "#050505";
+    ctx.fillRect(-infoWidth / 2, -62, infoWidth, 94);
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText(info, 0, 8);
+    ctx.restore();
+  }
+
+  const tagY = 1395;
+  const tagGap = 24;
+  const tagWidth = features.length === 1 ? 430 : features.length === 2 ? 390 : 292;
+  const totalWidth = features.length * tagWidth + Math.max(0, features.length - 1) * tagGap;
+  features.forEach((feature, index) => {
+    const centerX = (W - totalWidth) / 2 + tagWidth / 2 + index * (tagWidth + tagGap);
+    const angle = [-4, 2, -3][index] || 0;
+    const size = fitComicFont(feature, 58, tagWidth - 40);
+    ctx.save();
+    ctx.translate(centerX, tagY + (index % 2) * 24);
+    ctx.rotate((angle * Math.PI) / 180);
+    ctx.fillStyle = "#ffffff";
+    ctx.strokeStyle = "#090909";
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.moveTo(-tagWidth / 2 - 18, -54);
+    ctx.lineTo(-tagWidth / 2 + 4, -78);
+    ctx.lineTo(-tagWidth / 2 + 26, -58);
+    ctx.lineTo(tagWidth / 2 - 8, -70);
+    ctx.lineTo(tagWidth / 2 + 18, -40);
+    ctx.lineTo(tagWidth / 2 + 5, 62);
+    ctx.lineTo(-tagWidth / 2 - 12, 56);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = "#ffd51c";
+    ctx.fillRect(-tagWidth / 2, -52, tagWidth, 104);
+    ctx.strokeRect(-tagWidth / 2, -52, tagWidth, 104);
+    ctx.font = `700 ${size}px ${family}`;
+    ctx.fillStyle = "#090909";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(feature, 0, 3);
+    ctx.restore();
+  });
+  ctx.restore();
+}
+
+function drawSmartHomeBlocksTemplate() {
+  const topLine = getValue("title");
+  const topSecondLine = getValue("area");
+  const bottomLine = getValue("location");
+  const bottomSecondLine = getValue("layout");
+  const family = `"Cover ShuHei", "Cover PangMen", "Microsoft YaHei", sans-serif`;
+  const orange = "#ff8500";
+  const cyan = "#09c9e6";
+
+  function fitBlockFont(text, startSize, maxWidth) {
+    let size = startSize;
+    do {
+      ctx.font = `700 ${size}px ${family}`;
+      if (ctx.measureText(text).width <= maxWidth) return size;
+      size -= 3;
+    } while (size > 38);
+    return size;
+  }
+
+  function drawBlockLine(text, anchorX, centerY, startSize, maxWidth, color, align) {
+    if (!text) return;
+    const size = fitBlockFont(text, startSize, maxWidth - 72);
+    ctx.save();
+    ctx.font = `700 ${size}px ${family}`;
+    ctx.textAlign = align;
+    ctx.textBaseline = "middle";
+    const textWidth = ctx.measureText(text).width;
+    const horizontalPadding = Math.max(30, size * 0.16);
+    const verticalPadding = Math.max(18, size * 0.12);
+    const blockWidth = textWidth + horizontalPadding * 2;
+    const blockHeight = size + verticalPadding * 2;
+    const blockX = align === "right" ? anchorX - blockWidth : anchorX;
+    const blockY = centerY - blockHeight / 2;
+    const opticalTextY = centerY - size * 0.035;
+
+    ctx.fillStyle = color;
+    ctx.fillRect(blockX, blockY, blockWidth, blockHeight);
+    ctx.fillStyle = "#050505";
+    ctx.fillText(
+      text,
+      align === "right" ? anchorX - horizontalPadding : anchorX + horizontalPadding,
+      opticalTextY,
+    );
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  drawBlockLine(topLine, 28, 432, 150, 860, orange, "left");
+  drawBlockLine(topSecondLine, 28, 617, 150, 740, orange, "left");
+  drawBlockLine(bottomLine, W - 36, 1294, 100, 620, cyan, "right");
+  drawBlockLine(bottomSecondLine, W - 36, 1443, 92, 840, cyan, "right");
+
+  ctx.restore();
+}
+
+function drawEditorialDayTemplate() {
+  const kicker = getValue("title");
+  const headlineLines = getValue("area")
+    .split(/[｜|]+/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 2);
+  const role = getValue("location");
+  const footer = getValue("layout");
+  const serif = `"Cover Instrument", "Cover Cormorant", "Times New Roman", serif`;
+  const sans = `"Cover Smiley Sans", Arial, sans-serif`;
+  const orange = "#f04a16";
+  const labelOrange = "#ff9d12";
+
+  function fitEditorialFont(text, startSize, maxWidth, family, weight = 400) {
+    let size = startSize;
+    do {
+      ctx.font = `${weight} ${size}px ${family}`;
+      if (ctx.measureText(text).width <= maxWidth) return size;
+      size -= 3;
+    } while (size > 34);
+    return size;
+  }
+
+  function drawBurst(cx, cy, innerRadius, outerRadius, points) {
+    ctx.beginPath();
+    for (let index = 0; index < points * 2; index += 1) {
+      const angle = -Math.PI / 2 + (index * Math.PI) / points;
+      const radius = index % 2 === 0 ? outerRadius : innerRadius;
+      const x = cx + Math.cos(angle) * radius;
+      const y = cy + Math.sin(angle) * radius;
+      if (index === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+  }
+
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  ctx.fillStyle = "rgba(76,52,36,0.22)";
+  ctx.fillRect(24, 150, W - 48, 1380);
+
+  drawBurst(300, 520, 205, 350, 13);
+  ctx.fillStyle = orange;
+  ctx.fill();
+
+  if (kicker) {
+    const kickerSize = fitEditorialFont(kicker, 76, 760, sans, 700);
+    ctx.save();
+    ctx.translate(138, 500);
+    ctx.rotate((-4 * Math.PI) / 180);
+    ctx.font = `700 ${kickerSize}px ${sans}`;
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText(kicker.toUpperCase(), 0, 0);
+    ctx.restore();
+  }
+
+  const lines = headlineLines.length ? headlineLines : ["DAY IN", "MY LIFE"];
+  lines.forEach((line, index) => {
+    const size = fitEditorialFont(line, index === 0 ? 230 : 246, 820, serif, 400);
+    ctx.save();
+    ctx.translate(610, 735 + index * 235);
+    ctx.rotate((-3.5 * Math.PI) / 180);
+    ctx.font = `400 ${size}px ${serif}`;
+    ctx.fillStyle = "#fffdf8";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText(line, 0, 0);
+    ctx.restore();
+  });
+
+  if (role) {
+    const words = role.toUpperCase().split(/\s+/).filter(Boolean);
+    const splitAt = Math.max(1, Math.ceil(words.length / 2));
+    const roleLines = [words.slice(0, splitAt).join(" "), words.slice(splitAt).join(" ")].filter(Boolean);
+    ctx.save();
+    ctx.translate(705, 1215);
+    ctx.strokeStyle = labelOrange;
+    ctx.lineWidth = 10;
+    ctx.strokeRect(-290, -92, 580, 184);
+    ctx.fillStyle = labelOrange;
+    ctx.fillRect(-280, -82, 560, 164);
+    roleLines.forEach((line, index) => {
+      const size = fitEditorialFont(line, 65, 520, sans, 700);
+      ctx.font = `700 ${size}px ${sans}`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = orange;
+      ctx.lineWidth = 5;
+      ctx.strokeText(line, 0, -40 + index * 78);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(line, 0, -40 + index * 78);
+    });
+    ctx.restore();
+  }
+
+  if (footer) {
+    const footerSize = fitEditorialFont(footer, 48, 660, sans, 700);
+    ctx.font = `700 ${footerSize}px ${sans}`;
+    ctx.fillStyle = "#fffdf8";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText(footer.toUpperCase(), 92, 1490);
+  }
+
+  ctx.restore();
+}
+
+function drawViralRoastTemplate() {
+  const topLine = getValue("title");
+  const mainLine = getValue("area");
+  const reactionLine = getValue("location");
+  const questionLine = getValue("layout");
+  const family = `"Cover ShuHei", "Cover Zcool Cool Black", "Microsoft YaHei", sans-serif`;
+  const yellow = "#ffd20a";
+  const white = "#ffffff";
+
+  function fitImpactFont(text, startSize, maxWidth) {
+    let size = startSize;
+    do {
+      ctx.font = `700 ${size}px ${family}`;
+      if (ctx.measureText(text).width <= maxWidth) return size;
+      size -= 3;
+    } while (size > 42);
+    return size;
+  }
+
+  function drawImpactLine(text, centerX, baselineY, startSize, maxWidth, options = {}) {
+    if (!text) return;
+    const { baseFill = white, highlightLast = 0, angle = 0 } = options;
+    const size = fitImpactFont(text, startSize, maxWidth - 70);
+    ctx.save();
+    ctx.translate(centerX, baselineY);
+    ctx.rotate((angle * Math.PI) / 180);
+    ctx.font = `700 ${size}px ${family}`;
+    ctx.textBaseline = "alphabetic";
+    ctx.textAlign = "center";
+    ctx.lineJoin = "round";
+    ctx.miterLimit = 2;
+
+    ctx.shadowColor = "rgba(0,0,0,0.82)";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 10;
+    ctx.shadowOffsetY = 13;
+    ctx.strokeStyle = white;
+    ctx.lineWidth = Math.max(22, size * 0.17);
+    ctx.strokeText(text, 0, 0);
+
+    ctx.shadowColor = "transparent";
+    ctx.strokeStyle = "#050505";
+    ctx.lineWidth = Math.max(13, size * 0.1);
+    ctx.strokeText(text, 0, 0);
+
+    const chars = Array.from(text);
+    const textWidth = ctx.measureText(text).width;
+    let cursor = -textWidth / 2;
+    ctx.textAlign = "left";
+    chars.forEach((char, index) => {
+      ctx.fillStyle = highlightLast > 0 && index >= chars.length - highlightLast ? yellow : baseFill;
+      ctx.fillText(char, cursor, 0);
+      cursor += ctx.measureText(char).width;
+    });
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  const topShade = ctx.createLinearGradient(0, 120, 0, 760);
+  topShade.addColorStop(0, "rgba(0,0,0,0.10)");
+  topShade.addColorStop(0.65, "rgba(0,0,0,0.04)");
+  topShade.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = topShade;
+  ctx.fillRect(0, 100, W, 700);
+
+  drawImpactLine(topLine, W / 2, 465, 154, 930, { baseFill: white, angle: -1 });
+  drawImpactLine(mainLine, W / 2, 655, 184, 950, { baseFill: yellow, angle: 0.5 });
+  drawImpactLine(reactionLine, 690, 1010, 124, 720, { baseFill: white, highlightLast: 2, angle: 1 });
+  drawImpactLine(questionLine, 700, 1180, 170, 650, {
+    baseFill: white,
+    highlightLast: Math.max(1, Array.from(questionLine).length - 1),
+    angle: -1,
+  });
+
+  ctx.restore();
+}
+
 function drawAvatar(x, y, r) {
   const grd = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
   grd.addColorStop(0, "#ffc936");
@@ -818,6 +1254,14 @@ function render() {
     drawDutchCubeTemplate();
   } else if (templateId === "cuteCarousel") {
     drawCuteCarouselTemplate();
+  } else if (templateId === "comicLivingRoom") {
+    drawComicLivingRoomTemplate();
+  } else if (templateId === "smartHomeBlocks") {
+    drawSmartHomeBlocksTemplate();
+  } else if (templateId === "editorialDay") {
+    drawEditorialDayTemplate();
+  } else if (templateId === "viralRoast") {
+    drawViralRoastTemplate();
   } else {
     drawEstateBoldTemplate();
   }
@@ -873,6 +1317,11 @@ async function loadCoverFonts() {
     document.fonts.load('400 110px "Cover Xiaolai"', "动画教程"),
     document.fonts.load('800 150px "Cover FangYuan"', "可爱轮播图"),
     document.fonts.load('400 150px "Cover Zcool Happy"', "可爱轮播图"),
+    document.fonts.load('700 170px "Cover ShuHei"', "这个客厅也太大了吧"),
+    document.fonts.load('700 170px "Cover ShuHei"', "当房子变成懂你的家"),
+    document.fonts.load('400 240px "Cover Instrument"', "DAY IN MY LIFE"),
+    document.fonts.load('700 76px "Cover Smiley Sans"', "A TIMESTAMPED"),
+    document.fonts.load('700 180px "Cover ShuHei"', "第四代住宅"),
   ]);
   render();
 }

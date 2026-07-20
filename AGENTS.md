@@ -31,6 +31,10 @@ This repository contains a browser-based Xiaohongshu real-estate cover generator
 - `bauhausRoomTour`: 包豪斯 Room Tour
 - `dutchCube`: 荷兰建筑杂志版
 - `cuteCarousel`: 中文手写小清新版
+- `comicLivingRoom`: 漫画客厅冲击版
+- `smartHomeBlocks`: 智慧家装色块版
+- `editorialDay`: 生活杂志拼贴版
+- `viralRoast`: 爆款吐槽大字版
 
 ## Editing conventions
 
