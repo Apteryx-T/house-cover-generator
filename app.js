@@ -106,6 +106,36 @@ const templateDefaults = {
     location: "总价低配套全",
     layout: "能买吗？",
   },
+  greenEstatePoster: {
+    title: "好房上新",
+    area: "告别租房生活，上车属于你的理想家",
+    location: "捡漏好房",
+    layout: "低总价｜近地铁｜配套成熟",
+  },
+  cityMagazine: {
+    title: "城市好房",
+    area: "核心地段",
+    location: "地铁口现房",
+    layout: "通勤便利｜配套成熟",
+  },
+  yellowFramePoster: {
+    title: "#好房",
+    area: "买房就要认真选",
+    location: "主播严选",
+    layout: "真实房源｜实景带看",
+  },
+  blueMorningMagazine: {
+    title: "好房午后|风格房",
+    area: "去看看理想生活",
+    location: "城市核心区",
+    layout: "通勤便利｜采光通透",
+  },
+  retroOrangeGreen: {
+    title: "这套好房",
+    area: "被我选中了",
+    location: "城市核心好房",
+    layout: "采光通透｜舒适三居",
+  },
 };
 
 const W = canvas.width;
@@ -128,6 +158,11 @@ function getTemplateId() {
 function applyTemplateDefaults(templateId) {
   const defaults = templateDefaults[templateId];
   if (!defaults) return;
+
+  const titleSplitHint = document.getElementById("titleSplitHint");
+  if (titleSplitHint) {
+    titleSplitHint.hidden = templateId !== "blueMorningMagazine";
+  }
 
   Object.entries(defaults).forEach(([key, value]) => {
     if (key !== "bottomCard" && refs[key]) {
@@ -1184,6 +1219,399 @@ function drawViralRoastTemplate() {
   ctx.restore();
 }
 
+function drawGreenEstatePosterTemplate() {
+  const title = getValue("title");
+  const subtitle = getValue("area");
+  const tag = getValue("location");
+  const sellingPoints = getValue("layout").split(/[｜|]/).filter(Boolean).slice(0, 3);
+  const displayFamily = `"Cover ShuHei", "Cover PangMen", "Microsoft YaHei", sans-serif`;
+  const yellow = "#f0dc00";
+
+  function fitPosterFont(text, startSize, maxWidth, minSize = 38) {
+    let size = startSize;
+    while (size > minSize) {
+      ctx.font = `700 ${size}px ${displayFamily}`;
+      if (ctx.measureText(text).width <= maxWidth) break;
+      size -= 3;
+    }
+    return size;
+  }
+
+  ctx.save();
+
+  const titleSize = fitPosterFont(title, 270, 970, 120);
+  ctx.font = `700 ${titleSize}px ${displayFamily}`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = yellow;
+  ctx.fillText(title, W / 2, 545);
+
+  const subtitleSize = fitPosterFont(subtitle, 54, 960, 34);
+  ctx.font = `700 ${subtitleSize}px ${displayFamily}`;
+  ctx.fillText(subtitle, W / 2, 735);
+
+  const pillWidth = Math.min(390, Math.max(250, tag.length * 62 + 80));
+  ctx.fillStyle = yellow;
+  ctx.beginPath();
+  ctx.roundRect(46, 835, pillWidth, 86, 28);
+  ctx.fill();
+  const tagSize = fitPosterFont(tag, 60, pillWidth - 58, 32);
+  ctx.font = `700 ${tagSize}px ${displayFamily}`;
+  ctx.fillStyle = "#101710";
+  ctx.fillText(tag, 46 + pillWidth / 2, 880);
+
+  if (sellingPoints.length) {
+    ctx.save();
+    ctx.translate(565, 1350);
+    ctx.rotate((-2 * Math.PI) / 180);
+    ctx.fillStyle = yellow;
+    ctx.beginPath();
+    ctx.roundRect(-300, -185, 600, 370, 22);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(15,22,12,0.8)";
+    ctx.lineWidth = 5;
+    ctx.stroke();
+
+    const lineHeight = 92;
+    const blockHeight = sellingPoints.length * lineHeight;
+    sellingPoints.forEach((line, index) => {
+      const size = fitPosterFont(line, 76, 520, 42);
+      ctx.font = `700 ${size}px ${displayFamily}`;
+      ctx.fillStyle = "#111711";
+      ctx.fillText(line, 0, -blockHeight / 2 + lineHeight / 2 + index * lineHeight);
+    });
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+function drawCityMagazineTemplate() {
+  const title = getValue("title");
+  const feature = getValue("area");
+  const location = getValue("location");
+  const details = getValue("layout");
+  const sans = `"Cover PangMen", "Cover ShuHei", "Cover Optimum", "Microsoft YaHei", sans-serif`;
+  const bodySans = `"Cover ShuHei", "Microsoft YaHei", sans-serif`;
+  const cyan = "#08a8d6";
+  const yellow = "#ffd20a";
+
+  function fitMagazineFont(text, startSize, maxWidth, minSize = 34, weight = 700) {
+    let size = startSize;
+    while (size > minSize) {
+      ctx.font = `${weight} ${size}px ${sans}`;
+      if (ctx.measureText(text).width <= maxWidth) break;
+      size -= 3;
+    }
+    return size;
+  }
+
+  ctx.save();
+  ctx.textBaseline = "middle";
+
+  const titleSize = fitMagazineFont(title, 250, 1030, 110);
+  ctx.font = `700 ${titleSize}px ${sans}`;
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "center";
+  ctx.fillText(title, W / 2, 405);
+
+  ctx.save();
+  ctx.translate(W / 2, 1020);
+  ctx.rotate((-7 * Math.PI) / 180);
+  ctx.fillStyle = yellow;
+  ctx.fillRect(-620, -195, 1240, 390);
+
+  const featureSize = fitMagazineFont(feature, 260, 1030, 110);
+  ctx.font = `700 ${featureSize}px ${sans}`;
+  ctx.fillStyle = cyan;
+  ctx.textAlign = "center";
+  ctx.fillText(feature, 0, -58);
+
+  let detailSize = 42;
+  do {
+    ctx.font = `700 ${detailSize}px ${bodySans}`;
+    if (ctx.measureText(details).width <= 940) break;
+    detailSize -= 2;
+  } while (detailSize > 26);
+  ctx.fillStyle = "#111111";
+  ctx.fillText(details, 0, 128);
+  ctx.restore();
+
+  ctx.textAlign = "right";
+  ctx.fillStyle = yellow;
+  const locationSize = fitMagazineFont(location, 52, 510, 32);
+  ctx.font = `700 ${locationSize}px ${sans}`;
+  ctx.fillText(location, W - 42, 1515);
+
+  ctx.restore();
+}
+
+function drawYellowFramePosterTemplate() {
+  const title = getValue("title");
+  const subtitle = getValue("area");
+  const label = getValue("location");
+  const description = getValue("layout");
+  const displayFamily = `"Cover PangMen", "Cover ShuHei", "Microsoft YaHei", sans-serif`;
+  const bodyFamily = `"Cover ShuHei", "Microsoft YaHei", sans-serif`;
+  const yellow = "#ffdc08";
+  const posterX = 62;
+  const posterY = 260;
+  const posterW = 956;
+  const posterH = 1365;
+  const frame = 30;
+  const photoH = 865;
+
+  function fitYellowPosterFont(text, startSize, maxWidth, minSize = 32, family = displayFamily) {
+    let size = startSize;
+    while (size > minSize) {
+      ctx.font = `700 ${size}px ${family}`;
+      if (ctx.measureText(text).width <= maxWidth) break;
+      size -= 3;
+    }
+    return size;
+  }
+
+  function drawImageCoverInRect(x, y, width, height) {
+    if (!state.image) return;
+    const img = state.image;
+    const scale = Math.max(width / img.width, height / img.height);
+    const drawWidth = img.width * scale;
+    const drawHeight = img.height * scale;
+    const drawX = x + (width - drawWidth) / 2;
+    const drawY = y + (height - drawHeight) / 2;
+    ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+  }
+
+  ctx.save();
+
+  ctx.shadowColor = "rgba(0,0,0,0.45)";
+  ctx.shadowBlur = 28;
+  ctx.shadowOffsetY = 18;
+  ctx.fillStyle = yellow;
+  ctx.beginPath();
+  ctx.roundRect(posterX, posterY, posterW, posterH, 18);
+  ctx.fill();
+  ctx.shadowColor = "transparent";
+
+  const photoX = posterX + frame;
+  const photoY = posterY + frame;
+  const photoW = posterW - frame * 2;
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(photoX, photoY, photoW, photoH, 8);
+  ctx.clip();
+  drawImageCoverInRect(photoX, photoY, photoW, photoH);
+  ctx.restore();
+
+  const copyTop = photoY + photoH + 28;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "#101820";
+  const titleSize = fitYellowPosterFont(title, 190, posterW - 80, 90);
+  ctx.font = `700 ${titleSize}px ${displayFamily}`;
+  ctx.fillText(title, W / 2, copyTop + 105);
+
+  const subtitleSize = fitYellowPosterFont(subtitle, 66, posterW - 100, 36, bodyFamily);
+  ctx.font = `700 ${subtitleSize}px ${bodyFamily}`;
+  ctx.fillText(subtitle, W / 2, copyTop + 245);
+
+  ctx.strokeStyle = "rgba(16,24,32,0.72)";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(posterX + 55, copyTop + 310);
+  ctx.lineTo(posterX + posterW - 55, copyTop + 310);
+  ctx.stroke();
+
+  ctx.textAlign = "left";
+  ctx.font = `700 39px ${bodyFamily}`;
+  ctx.fillText(label, posterX + 55, copyTop + 350);
+  const descriptionSize = fitYellowPosterFont(description, 34, 570, 24, bodyFamily);
+  ctx.font = `700 ${descriptionSize}px ${bodyFamily}`;
+  ctx.fillText(description, posterX + 55, copyTop + 405);
+
+  ctx.restore();
+}
+
+function drawBlueMorningMagazineTemplate() {
+  const [titleTop = "", ...titleRest] = getValue("title").split("|");
+  const titleBottom = titleRest.join("|").trim();
+  const headline = getValue("area");
+  const location = getValue("location");
+  const displayFamily = `"Cover PangMen", "Cover ShuHei", "Microsoft YaHei", sans-serif`;
+  const bodyFamily = `"Cover ShuHei", "Microsoft YaHei", sans-serif`;
+  const blue = "#0873cf";
+  const photoX = 58;
+  const photoY = 684;
+  const photoW = 964;
+  const photoH = 922;
+
+  function fitBlueFont(text, startSize, maxWidth, minSize = 34, family = displayFamily) {
+    let size = startSize;
+    while (size > minSize) {
+      ctx.font = `700 ${size}px ${family}`;
+      if (ctx.measureText(text).width <= maxWidth) break;
+      size -= 3;
+    }
+    return size;
+  }
+
+  function drawImageCoverInRect(x, y, width, height) {
+    if (!state.image) return;
+    const img = state.image;
+    const scale = Math.max(width / img.width, height / img.height);
+    const drawWidth = img.width * scale;
+    const drawHeight = img.height * scale;
+    ctx.drawImage(
+      img,
+      x + (width - drawWidth) / 2,
+      y + (height - drawHeight) / 2,
+      drawWidth,
+      drawHeight,
+    );
+  }
+
+  ctx.save();
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, W, DESIGN_H);
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = blue;
+
+  const topSize = fitBlueFont(titleTop, 300, 930, 140);
+  ctx.font = `700 ${topSize}px ${displayFamily}`;
+  ctx.textAlign = "left";
+  ctx.fillText(titleTop, 56, 415);
+
+  ctx.fillStyle = blue;
+  ctx.fillRect(58, 540, 424, 118);
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "left";
+  const labelSize = fitBlueFont(location, 42, 345, 27, bodyFamily);
+  ctx.font = `700 ${labelSize}px ${bodyFamily}`;
+  ctx.fillText(location, 98, 599);
+
+  if (titleBottom) {
+    const bottomSize = fitBlueFont(titleBottom, 148, 525, 72);
+    ctx.font = `700 ${bottomSize}px ${displayFamily}`;
+    ctx.fillStyle = blue;
+    ctx.textAlign = "left";
+    ctx.fillText(titleBottom, 495, 599);
+  }
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(photoX, photoY, photoW, photoH);
+  ctx.clip();
+  drawImageCoverInRect(photoX, photoY, photoW, photoH);
+  ctx.restore();
+
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "left";
+  const headlineSize = fitBlueFont(headline, 70, 520, 42, bodyFamily);
+  ctx.font = `700 ${headlineSize}px ${bodyFamily}`;
+  const headlineChars = Array.from(headline);
+  const headlineSplit = Math.max(1, Math.ceil(headlineChars.length / 2));
+  ctx.fillText(headlineChars.slice(0, headlineSplit).join(""), 96, 780);
+  ctx.fillText(headlineChars.slice(headlineSplit).join(""), 96, 855);
+
+  ctx.restore();
+}
+
+function drawRetroOrangeGreenTemplate() {
+  const title = getValue("title");
+  const headline = getValue("area");
+  const label = getValue("location");
+  const details = getValue("layout");
+  const displayFamily = `"Cover ShuHei", "Cover FangYuan", "Microsoft YaHei", sans-serif`;
+  const bodyFamily = `"Cover ShuHei", "Microsoft YaHei", sans-serif`;
+  const orange = "#f6a51f";
+
+  function fitRetroFont(text, startSize, maxWidth, minSize = 42, family = displayFamily) {
+    let size = startSize;
+    while (size > minSize) {
+      ctx.font = `700 ${size}px ${family}`;
+      if (ctx.measureText(text).width <= maxWidth) break;
+      size -= 3;
+    }
+    return size;
+  }
+
+  ctx.save();
+
+  function drawRetroHeadline(text, centerX, centerY, startSize, angle, arcDepth = 42) {
+    if (!text) return;
+    const size = fitRetroFont(text, startSize, 970, 90);
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate((angle * Math.PI) / 180);
+    ctx.font = `700 ${size}px ${displayFamily}`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = orange;
+    ctx.strokeStyle = "rgba(18,48,36,0.82)";
+    ctx.lineWidth = Math.max(6, size * 0.028);
+    ctx.lineJoin = "round";
+    const chars = Array.from(text);
+    const widths = chars.map((char) => ctx.measureText(char).width);
+    const tracking = -size * 0.055;
+    const totalWidth = widths.reduce((sum, width) => sum + width, 0) + tracking * Math.max(0, chars.length - 1);
+    let cursor = -totalWidth / 2;
+
+    chars.forEach((char, index) => {
+      const charX = cursor + widths[index] / 2;
+      const normalizedX = totalWidth ? charX / (totalWidth / 2) : 0;
+      const charY = arcDepth * normalizedX * normalizedX - arcDepth / 2;
+      const tangent = Math.atan((4 * arcDepth * charX) / Math.max(1, totalWidth * totalWidth));
+      ctx.save();
+      ctx.translate(charX, charY);
+      ctx.rotate(tangent);
+      ctx.strokeText(char, 0, 0);
+      ctx.fillText(char, 0, 0);
+      ctx.restore();
+      cursor += widths[index] + tracking;
+    });
+    ctx.restore();
+  }
+
+  drawRetroHeadline(title, W / 2, 455, 220, -4, 44);
+  drawRetroHeadline(headline, W / 2, 655, 205, -5, 48);
+
+  ctx.save();
+  ctx.translate(420, 865);
+  ctx.rotate((-15 * Math.PI) / 180);
+  const labelSize = fitRetroFont(label, 58, 650, 34, bodyFamily);
+  ctx.font = `700 ${labelSize}px ${bodyFamily}`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = orange;
+  const labelChars = Array.from(label);
+  const labelWidths = labelChars.map((char) => ctx.measureText(char).width);
+  const labelTracking = -labelSize * 0.035;
+  const labelWidth = labelWidths.reduce((sum, width) => sum + width, 0) + labelTracking * Math.max(0, labelChars.length - 1);
+  let labelCursor = -labelWidth / 2;
+  labelChars.forEach((char, index) => {
+    const charX = labelCursor + labelWidths[index] / 2;
+    const normalizedX = labelWidth ? charX / (labelWidth / 2) : 0;
+    const charY = 18 * normalizedX * normalizedX - 9;
+    ctx.save();
+    ctx.translate(charX, charY);
+    ctx.rotate(Math.atan((72 * charX) / Math.max(1, labelWidth * labelWidth)));
+    ctx.fillText(char, 0, 0);
+    ctx.restore();
+    labelCursor += labelWidths[index] + labelTracking;
+  });
+  ctx.restore();
+
+  const verticalText = Array.from(details.replace(/[｜|]/g, "·"));
+  ctx.fillStyle = orange;
+  ctx.font = `700 30px ${bodyFamily}`;
+  ctx.textAlign = "center";
+  verticalText.slice(0, 12).forEach((char, index) => {
+    ctx.fillText(char, 1000, 1290 + index * 38);
+  });
+
+  ctx.restore();
+}
+
 function drawAvatar(x, y, r) {
   const grd = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
   grd.addColorStop(0, "#ffc936");
@@ -1262,6 +1690,16 @@ function render() {
     drawEditorialDayTemplate();
   } else if (templateId === "viralRoast") {
     drawViralRoastTemplate();
+  } else if (templateId === "greenEstatePoster") {
+    drawGreenEstatePosterTemplate();
+  } else if (templateId === "cityMagazine") {
+    drawCityMagazineTemplate();
+  } else if (templateId === "yellowFramePoster") {
+    drawYellowFramePosterTemplate();
+  } else if (templateId === "blueMorningMagazine") {
+    drawBlueMorningMagazineTemplate();
+  } else if (templateId === "retroOrangeGreen") {
+    drawRetroOrangeGreenTemplate();
   } else {
     drawEstateBoldTemplate();
   }
@@ -1322,6 +1760,11 @@ async function loadCoverFonts() {
     document.fonts.load('400 240px "Cover Instrument"', "DAY IN MY LIFE"),
     document.fonts.load('700 76px "Cover Smiley Sans"', "A TIMESTAMPED"),
     document.fonts.load('700 180px "Cover ShuHei"', "第四代住宅"),
+    document.fonts.load('700 270px "Cover ShuHei"', "好房上新"),
+    document.fonts.load('700 250px "Cover ShuHei"', "城市好房"),
+    document.fonts.load('700 190px "Cover PangMen"', "#好房"),
+    document.fonts.load('700 300px "Cover PangMen"', "好房午后"),
+    document.fonts.load('700 220px "Cover Zcool Happy"', "这套好房"),
   ]);
   render();
 }

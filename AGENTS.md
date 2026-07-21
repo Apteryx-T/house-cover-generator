@@ -35,6 +35,11 @@ This repository contains a browser-based Xiaohongshu real-estate cover generator
 - `smartHomeBlocks`: 智慧家装色块版
 - `editorialDay`: 生活杂志拼贴版
 - `viralRoast`: 爆款吐槽大字版
+- `greenEstatePoster`: 森系好房海报版
+- `cityMagazine`: 都市房产杂志版
+- `yellowFramePoster`: 黄框人物海报版
+- `blueMorningMagazine`: 蓝白清晨杂志版
+- `retroOrangeGreen`: 复古橙绿海报版
 
 ## Editing conventions
 
