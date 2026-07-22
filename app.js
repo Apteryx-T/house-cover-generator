@@ -136,6 +136,18 @@ const templateDefaults = {
     location: "城市核心好房",
     layout: "采光通透｜舒适三居",
   },
+  whiteFrameCity: {
+    title: "理想好房",
+    area: "城市生活最佳答案",
+    location: "城市核心地段",
+    layout: "主播严选｜实景探房",
+  },
+  propertyPostcard: {
+    title: "遇见",
+    area: "理想好房",
+    location: "预约看房|实景带看·户型解析|主播严选真实房源",
+    layout: "近地铁｜采光通透｜配套成熟",
+  },
 };
 
 const W = canvas.width;
@@ -162,6 +174,10 @@ function applyTemplateDefaults(templateId) {
   const titleSplitHint = document.getElementById("titleSplitHint");
   if (titleSplitHint) {
     titleSplitHint.hidden = templateId !== "blueMorningMagazine";
+  }
+  const locationSplitHint = document.getElementById("locationSplitHint");
+  if (locationSplitHint) {
+    locationSplitHint.hidden = templateId !== "propertyPostcard";
   }
 
   Object.entries(defaults).forEach(([key, value]) => {
@@ -1612,6 +1628,156 @@ function drawRetroOrangeGreenTemplate() {
   ctx.restore();
 }
 
+function drawWhiteFrameCityTemplate() {
+  const title = getValue("title");
+  const headline = getValue("area");
+  const location = getValue("location");
+  const details = getValue("layout");
+  const displayFamily = `"Cover FangYuan", "Cover ShuHei", "Microsoft YaHei", sans-serif`;
+  const bodyFamily = `"Cover ShuHei", "Microsoft YaHei", sans-serif`;
+  const frameX = (W - 880) / 2;
+  const frameY = 360;
+  const frameW = 880;
+  const frameH = 885;
+
+  function fitWhiteFrameFont(text, startSize, maxWidth, minSize = 36, family = displayFamily, weight = 700) {
+    let size = startSize;
+    while (size > minSize) {
+      ctx.font = `${weight} ${size}px ${family}`;
+      if (ctx.measureText(text).width <= maxWidth) break;
+      size -= 3;
+    }
+    return size;
+  }
+
+  function splitForTwoLines(text) {
+    const chars = Array.from(text);
+    if (chars.length <= 5) return [text];
+    const splitAt = Math.ceil(chars.length / 2);
+    return [chars.slice(0, splitAt).join(""), chars.slice(splitAt).join("")];
+  }
+
+  ctx.save();
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 12;
+  ctx.strokeRect(frameX, frameY, frameW, frameH);
+
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  const mainLines = [title, ...splitForTwoLines(headline)].filter(Boolean).slice(0, 3);
+  const lineHeight = 155;
+  const blockTop = mainLines.length === 1 ? 940 : mainLines.length === 2 ? 850 : 790;
+  mainLines.forEach((line, index) => {
+    const size = fitWhiteFrameFont(line, 142, frameW - 90, 70, displayFamily, 650);
+    ctx.font = `650 ${size}px ${displayFamily}`;
+    ctx.fillText(line, frameX + 48, blockTop + index * lineHeight);
+  });
+
+  const detailParts = details.split(/[｜|]/).map((item) => item.trim()).filter(Boolean);
+  ctx.textAlign = "left";
+  ctx.font = `700 68px ${bodyFamily}`;
+  ctx.fillText(detailParts[0] || "实景探房", 58, 1480);
+  ctx.fillText(detailParts.slice(1).join(" · ") || "好房推荐", 58, 1555);
+
+  ctx.textAlign = "right";
+  const locationSize = fitWhiteFrameFont(location, 46, 430, 28, bodyFamily, 700);
+  ctx.font = `700 ${locationSize}px ${bodyFamily}`;
+  ctx.fillText(location, W - 55, 1550);
+
+  ctx.restore();
+}
+
+function drawPropertyPostcardTemplate() {
+  const title = getValue("title");
+  const headline = getValue("area");
+  const location = getValue("location");
+  const locationLines = location.split("|").map((item) => item.trim()).filter(Boolean).slice(0, 3);
+  const details = getValue("layout");
+  const displayFamily = `"Cover FangYuan", "Cover ShuHei", "Microsoft YaHei", sans-serif`;
+  const bodyFamily = `"Cover ShuHei", "Microsoft YaHei", sans-serif`;
+  const cardX = 36;
+  const cardY = 405;
+  const cardW = 1008;
+  const cardH = 1170;
+  const photoX = 105;
+  const photoY = 475;
+  const photoW = 870;
+  const photoH = 460;
+
+  function fitPostcardFont(text, startSize, maxWidth, minSize = 30, family = displayFamily, weight = 700) {
+    let size = startSize;
+    while (size > minSize) {
+      ctx.font = `${weight} ${size}px ${family}`;
+      if (ctx.measureText(text).width <= maxWidth) break;
+      size -= 3;
+    }
+    return size;
+  }
+
+  function drawImageCoverInRect(x, y, width, height) {
+    if (!state.image) return;
+    const img = state.image;
+    const scale = Math.max(width / img.width, height / img.height);
+    const drawWidth = img.width * scale;
+    const drawHeight = img.height * scale;
+    ctx.drawImage(
+      img,
+      x + (width - drawWidth) / 2,
+      y + (height - drawHeight) / 2,
+      drawWidth,
+      drawHeight,
+    );
+  }
+
+  ctx.save();
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(cardX, cardY, cardW, cardH);
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(photoX, photoY, photoW, photoH);
+  ctx.clip();
+  drawImageCoverInRect(photoX, photoY, photoW, photoH);
+  ctx.restore();
+
+  ctx.fillStyle = "#171717";
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "left";
+  const titleSize = fitPostcardFont(title, 68, 350, 38, bodyFamily, 700);
+  ctx.font = `700 ${titleSize}px ${bodyFamily}`;
+  ctx.fillText(title, 95, 1055);
+
+  const headlineSize = fitPostcardFont(headline, 132, 560, 66, displayFamily, 700);
+  ctx.font = `700 ${headlineSize}px ${displayFamily}`;
+  ctx.fillText(headline, 410, 1048);
+
+  ctx.strokeStyle = "#171717";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(105, 1175);
+  ctx.lineTo(975, 1175);
+  ctx.stroke();
+
+  const detailParts = details.split(/[｜|]/).map((item) => item.trim()).filter(Boolean).slice(0, 4);
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#222222";
+  ctx.font = `500 37px ${bodyFamily}`;
+  detailParts.forEach((item, index) => {
+    ctx.fillText(`• ${item}`, 105, 1250 + index * 58);
+  });
+
+  ctx.textAlign = "right";
+  locationLines.forEach((line, index) => {
+    const startSize = index === 0 ? 43 : 31;
+    const size = fitPostcardFont(line, startSize, 430, 24, bodyFamily, 700);
+    ctx.font = `700 ${size}px ${bodyFamily}`;
+    ctx.fillText(line, 955, 1250 + index * 60);
+  });
+
+  ctx.restore();
+}
+
 function drawAvatar(x, y, r) {
   const grd = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
   grd.addColorStop(0, "#ffc936");
@@ -1700,6 +1866,10 @@ function render() {
     drawBlueMorningMagazineTemplate();
   } else if (templateId === "retroOrangeGreen") {
     drawRetroOrangeGreenTemplate();
+  } else if (templateId === "whiteFrameCity") {
+    drawWhiteFrameCityTemplate();
+  } else if (templateId === "propertyPostcard") {
+    drawPropertyPostcardTemplate();
   } else {
     drawEstateBoldTemplate();
   }
@@ -1765,6 +1935,8 @@ async function loadCoverFonts() {
     document.fonts.load('700 190px "Cover PangMen"', "#好房"),
     document.fonts.load('700 300px "Cover PangMen"', "好房午后"),
     document.fonts.load('700 220px "Cover Zcool Happy"', "这套好房"),
+    document.fonts.load('650 142px "Cover FangYuan"', "理想好房"),
+    document.fonts.load('700 132px "Cover FangYuan"', "理想好房"),
   ]);
   render();
 }
