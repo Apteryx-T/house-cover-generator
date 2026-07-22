@@ -4,6 +4,7 @@ const ctx = canvas.getContext("2d");
 const refs = {
   imageInput: document.getElementById("imageInput"),
   template: document.getElementById("templateSelect"),
+  templateGallery: document.getElementById("templateGallery"),
   title: document.getElementById("titleInput"),
   area: document.getElementById("areaInput"),
   location: document.getElementById("locationInput"),
@@ -13,14 +14,15 @@ const refs = {
 
 const state = {
   image: null,
+  defaultImage: null,
 };
 
 const templateDefaults = {
   estateBold: {
-    title: "好房推荐",
-    area: "刚需两房",
-    location: "地铁口 · 配套成熟",
-    layout: "两室一厅一卫",
+    title: "客厅会说话",
+    area: "一家人的餐桌",
+    location: "沙发旁 · 留出奔跑距离",
+    layout: "两间房各有生活",
     caption: "国贸 CBD·78 m²一居｜一镜到底 Room Tour 国贸核心...",
     account: "安家在北京（瑞峰）",
     date: "2025-09-05",
@@ -28,10 +30,10 @@ const templateDefaults = {
     bottomCard: true,
   },
   varietyVisit: {
-    title: "这房真香",
-    area: "主播带你沉浸看房",
-    location: "真实带看｜户型深度解析",
-    layout: "到底值不值？",
+    title: "看房看生活",
+    area: "跟着一家人的一天",
+    location: "客厅奔跑｜餐桌慢慢聊天",
+    layout: "住起来怎样？",
     caption: "新家 Roomtour｜《超想迷你家》拍摄的一天 欢迎 @...",
     account: "李外里",
     date: "01-13",
@@ -39,9 +41,9 @@ const templateDefaults = {
     bottomCard: true,
   },
   sunnyEstate: {
-    title: "地铁口好房",
-    area: "#精装两房带电梯",
-    location: "南北通透#",
+    title: "阳光走进家",
+    area: "#落地窗旁晒被子",
+    location: "一家人围坐#",
     layout: "",
     caption: "市委家属院｜板楼带电梯｜三个阳台采光好",
     account: "城市好房",
@@ -50,10 +52,10 @@ const templateDefaults = {
     bottomCard: false,
   },
   bauhausRoomTour: {
-    title: "沉浸式看房",
-    area: "首付低",
-    location: "精装现房",
-    layout: "户型解析",
+    title: "跟着生活看房",
+    area: "饭桌够大",
+    location: "沙发留白",
+    layout: "动线会说话",
     caption: "17W日式中古风｜Room Tour 详解版",
     account: "我的中古之家",
     date: "2026-07-09",
@@ -61,10 +63,10 @@ const templateDefaults = {
     bottomCard: false,
   },
   dutchCube: {
-    title: "买房必看攻略",
-    area: "改善大平层实景探访",
-    location: "好房",
-    layout: "稀缺改善型住宅",
+    title: "看懂家的尺度",
+    area: "长沙发留出奔跑距离",
+    location: "一起住",
+    layout: "相聚不用挪家具",
     caption: "荷兰激进的住宅设计… 荷兰鹿特丹方块住宅和铅笔公寓",
     account: "建筑师黄伟",
     date: "2025-12-09",
@@ -72,9 +74,9 @@ const templateDefaults = {
     bottomCard: true,
   },
   cuteCarousel: {
-    title: "新手买房必看",
-    area: "看房避坑指南",
-    location: "选房攻略",
+    title: "第一次看懂家",
+    area: "看见生活动线",
+    location: "空间笔记",
     layout: "",
     caption: "小清新轮播图动画教程",
     account: "设计小笔记",
@@ -83,70 +85,70 @@ const templateDefaults = {
     bottomCard: false,
   },
   comicLivingRoom: {
-    title: "捡漏！",
-    area: "这套好房也太值了吧！",
-    location: "建面约120㎡ · 南北通透",
-    layout: "采光通透｜户型方正｜近地铁",
+    title: "开跑！",
+    area: "这间客厅装得下童年！",
+    location: "长沙发 · 留出奔跑距离",
+    layout: "孩子奔跑｜大人聊天｜狗狗打盹",
   },
   smartHomeBlocks: {
-    title: "当好房遇上",
-    area: "理想生活",
-    location: "主播严选好房",
-    layout: "满足你的置业需求",
+    title: "当空间留给",
+    area: "一起生活",
+    location: "客厅装下一家人",
+    layout: "沙发之外还有奔跑",
   },
   editorialDay: {
-    title: "今日探房实录",
-    area: "沉浸看房｜好房推荐",
-    location: "主播严选真实房源",
-    layout: "实景带看 · 户型解析",
+    title: "今日生活实录",
+    area: "孩子奔跑｜一家吃饭",
+    location: "镜头看见真实生活",
+    layout: "家具尺度 · 空间关系",
   },
   viralRoast: {
-    title: "买房一定要看",
-    area: "这套刚需好房",
-    location: "总价低配套全",
-    layout: "能买吗？",
+    title: "这间客厅要看",
+    area: "沙发没有占满空间",
+    location: "孩子跑得开",
+    layout: "才叫客厅",
   },
   greenEstatePoster: {
-    title: "好房上新",
-    area: "告别租房生活，上车属于你的理想家",
-    location: "捡漏好房",
-    layout: "低总价｜近地铁｜配套成熟",
+    title: "生活上新",
+    area: "长沙发留出了奔跑的距离",
+    location: "客厅会玩",
+    layout: "孩子奔跑｜朋友围坐｜阳光晒被",
   },
   cityMagazine: {
-    title: "城市好房",
-    area: "核心地段",
-    location: "地铁口现房",
-    layout: "通勤便利｜配套成熟",
+    title: "城市生活",
+    area: "一桌三餐",
+    location: "回家就开饭",
+    layout: "岛台备菜｜餐桌聊天",
   },
   yellowFramePoster: {
-    title: "#好房",
-    area: "买房就要认真选",
-    location: "主播严选",
-    layout: "真实房源｜实景带看",
+    title: "#生活",
+    area: "看房先看怎么住",
+    location: "空间观察",
+    layout: "家具尺度｜生活动线",
   },
   blueMorningMagazine: {
-    title: "好房午后|风格房",
-    area: "去看看理想生活",
-    location: "城市核心区",
-    layout: "通勤便利｜采光通透",
+    title: "一家吃饭|孩子奔跑",
+    area: "客厅留出生活",
+    location: "沙发之外有路",
+    layout: "餐桌聊天｜阳台晒被",
   },
   retroOrangeGreen: {
-    title: "这套好房",
-    area: "被我选中了",
-    location: "城市核心好房",
-    layout: "采光通透｜舒适三居",
+    title: "长沙发旁",
+    area: "留出奔跑距离",
+    location: "跑得开的童年",
+    layout: "孩子奔跑｜一家围坐",
   },
   whiteFrameCity: {
-    title: "理想好房",
-    area: "城市生活最佳答案",
-    location: "城市核心地段",
-    layout: "主播严选｜实景探房",
+    title: "客厅尺度",
+    area: "决定一家怎么相处",
+    location: "沙发旁留出路",
+    layout: "孩子奔跑｜家人聊天",
   },
   propertyPostcard: {
-    title: "遇见",
-    area: "理想好房",
-    location: "预约看房|实景带看·户型解析|主播严选真实房源",
-    layout: "近地铁｜采光通透｜配套成熟",
+    title: "住进",
+    area: "日常生活",
+    location: "一起吃饭|孩子写作业|朋友坐到深夜",
+    layout: "岛台备菜｜餐桌聊天｜阳台晒被",
   },
 };
 
@@ -186,6 +188,7 @@ function applyTemplateDefaults(templateId) {
     }
   });
   render();
+  syncTemplateCards();
 }
 
 function font(size, weight = 900) {
@@ -1891,6 +1894,103 @@ function loadImage(file) {
   reader.readAsDataURL(file);
 }
 
+function syncTemplateCards() {
+  if (!refs.templateGallery) return;
+  const activeTemplate = getTemplateId();
+  refs.templateGallery.querySelectorAll(".template-card").forEach((card) => {
+    const isSelected = card.dataset.templateId === activeTemplate;
+    card.classList.toggle("is-selected", isSelected);
+    card.setAttribute("aria-pressed", String(isSelected));
+  });
+}
+
+function createTemplateGallery() {
+  if (!refs.templateGallery) return;
+  refs.templateGallery.replaceChildren();
+  Array.from(refs.template.options).forEach((option) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "template-card";
+    button.dataset.templateId = option.value;
+    button.setAttribute("aria-label", option.textContent.trim());
+
+    const thumbnail = document.createElement("canvas");
+    thumbnail.width = 240;
+    thumbnail.height = 320;
+    thumbnail.setAttribute("aria-hidden", "true");
+
+    const name = document.createElement("span");
+    name.className = "template-card-name";
+    name.textContent = option.textContent.trim();
+
+    button.append(thumbnail, name);
+    button.addEventListener("click", () => {
+      refs.template.value = option.value;
+      applyTemplateDefaults(option.value);
+    });
+    refs.templateGallery.append(button);
+  });
+  syncTemplateCards();
+}
+
+function renderTemplateThumbnails() {
+  if (!refs.templateGallery || !state.defaultImage) return;
+  const savedTemplate = refs.template.value;
+  const savedImage = state.image;
+  const savedValues = {
+    title: refs.title.value,
+    area: refs.area.value,
+    location: refs.location.value,
+    layout: refs.layout.value,
+  };
+
+  state.image = state.defaultImage;
+  refs.templateGallery.querySelectorAll(".template-card").forEach((card) => {
+    const templateId = card.dataset.templateId;
+    const defaults = templateDefaults[templateId] || {};
+    refs.template.value = templateId;
+    ["title", "area", "location", "layout"].forEach((key) => {
+      if (refs[key] && typeof defaults[key] === "string") refs[key].value = defaults[key];
+    });
+    render();
+    const thumbnail = card.querySelector("canvas");
+    const thumbnailContext = thumbnail.getContext("2d");
+    thumbnailContext.clearRect(0, 0, thumbnail.width, thumbnail.height);
+    const sourceHeight = W * (thumbnail.height / thumbnail.width);
+    const sourceY = Math.max(0, (DESIGN_H - sourceHeight) / 2);
+    thumbnailContext.drawImage(
+      canvas,
+      0,
+      sourceY,
+      W,
+      sourceHeight,
+      0,
+      0,
+      thumbnail.width,
+      thumbnail.height,
+    );
+  });
+
+  refs.template.value = savedTemplate;
+  state.image = savedImage;
+  Object.entries(savedValues).forEach(([key, value]) => {
+    refs[key].value = value;
+  });
+  render();
+  syncTemplateCards();
+}
+
+function loadDefaultCoverImage() {
+  const img = new Image();
+  img.onload = () => {
+    state.defaultImage = img;
+    if (!state.image) state.image = img;
+    render();
+    renderTemplateThumbnails();
+  };
+  img.src = window.DEFAULT_COVER_DATA_URL || "assets/default-cover.jpg?v=1";
+}
+
 refs.imageInput.addEventListener("change", (event) => {
   loadImage(event.target.files[0]);
 });
@@ -1900,7 +2000,13 @@ refs.template.addEventListener("change", () => {
 });
 
 Object.values(refs).forEach((element) => {
-  if (!element || element === refs.imageInput || element === refs.download || element === refs.template) return;
+  if (
+    !element ||
+    element === refs.imageInput ||
+    element === refs.download ||
+    element === refs.template ||
+    element === refs.templateGallery
+  ) return;
   element.addEventListener("input", render);
   element.addEventListener("change", render);
 });
@@ -1912,6 +2018,8 @@ refs.download.addEventListener("click", () => {
   link.click();
 });
 
+createTemplateGallery();
+loadDefaultCoverImage();
 render();
 
 async function loadCoverFonts() {
@@ -1939,6 +2047,7 @@ async function loadCoverFonts() {
     document.fonts.load('700 132px "Cover FangYuan"', "理想好房"),
   ]);
   render();
+  renderTemplateThumbnails();
 }
 
 loadCoverFonts();

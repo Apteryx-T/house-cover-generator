@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>房源封面生成器</title>
-    <link rel="stylesheet" href="styles.css?v=25" />
+    <link rel="stylesheet" href="styles.css?v=33" />
   </head>
   <body>
     <main class="app-shell">
@@ -26,7 +26,7 @@
         </label>
 
         <div class="field-grid">
-          <label>
+          <label class="template-select-source">
             <span>风格</span>
             <select id="templateSelect">
               <option value="estateBold">房源大字版</option>
@@ -49,26 +49,34 @@
             </select>
           </label>
 
+          <section class="template-picker" aria-label="风格套装">
+            <div class="template-picker-heading">
+              <strong>风格套装</strong>
+              <span>Cover Styles</span>
+            </div>
+            <div id="templateGallery" class="template-gallery"></div>
+          </section>
+
           <label>
             <span>主标题</span>
-            <input id="titleInput" type="text" value="好房推荐" />
+            <input id="titleInput" type="text" value="客厅会说话" />
             <small id="titleSplitHint" class="field-hint" hidden>使用 | 分隔上下两行</small>
           </label>
 
           <label>
             <span>大标题/面积</span>
-            <input id="areaInput" type="text" value="刚需两房" />
+            <input id="areaInput" type="text" value="一家人的餐桌" />
           </label>
 
           <label>
             <span>小标签/地段</span>
-            <input id="locationInput" type="text" value="地铁口 · 配套成熟" />
+            <input id="locationInput" type="text" value="沙发旁 · 留出奔跑距离" />
             <small id="locationSplitHint" class="field-hint" hidden>使用 | 分隔三行</small>
           </label>
 
           <label>
             <span>副标题/户型</span>
-            <input id="layoutInput" type="text" value="两室一厅一卫" />
+            <input id="layoutInput" type="text" value="两间房各有生活" />
           </label>
 
         </div>
@@ -76,6 +84,7 @@
       </aside>
     </main>
 
-    <script src="app.js?v=74"></script>
+    <script src="assets/default-cover-data.js?v=1"></script>
+    <script src="app.js?v=80"></script>
   </body>
 </html>
