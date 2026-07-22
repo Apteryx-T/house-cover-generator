@@ -3,6 +3,7 @@ const ctx = canvas.getContext("2d");
 
 const refs = {
   imageInput: document.getElementById("imageInput"),
+  uploadLabel: document.getElementById("uploadLabel"),
   template: document.getElementById("templateSelect"),
   templateGallery: document.getElementById("templateGallery"),
   title: document.getElementById("titleInput"),
@@ -14,6 +15,7 @@ const refs = {
 
 const state = {
   image: null,
+  images: [],
   defaultImage: null,
 };
 
@@ -205,6 +207,56 @@ function fitFontSize(text, startSize, maxWidth, weight = 900) {
   return size;
 }
 
+function drawImageCoverInArea(img, x, y, width, height) {
+  const scale = Math.max(width / img.width, height / img.height);
+  const drawWidth = img.width * scale;
+  const drawHeight = img.height * scale;
+  const drawX = x + (width - drawWidth) / 2;
+  const drawY = y + (height - drawHeight) / 2;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, width, height);
+  ctx.clip();
+  ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+  ctx.restore();
+}
+
+function drawMultiImageBackground(images) {
+  const count = images.length;
+  if (count === 2) {
+    const cellH = DESIGN_H / 2;
+    drawImageCoverInArea(images[0], 0, 0, W, cellH);
+    drawImageCoverInArea(images[1], 0, cellH, W, cellH);
+    return;
+  }
+
+  if (count === 3) {
+    const cellH = DESIGN_H / 3;
+    images.forEach((img, index) => drawImageCoverInArea(img, 0, index * cellH, W, cellH));
+    return;
+  }
+
+  if (count === 4) {
+    const cellW = W / 2;
+    const cellH = DESIGN_H / 2;
+    images.forEach((img, index) => {
+      drawImageCoverInArea(img, (index % 2) * cellW, Math.floor(index / 2) * cellH, cellW, cellH);
+    });
+    return;
+  }
+
+  if (count >= 5) {
+    const cellW = W / 2;
+    const rowH = DESIGN_H / 3;
+    drawImageCoverInArea(images[0], 0, 0, cellW, rowH);
+    drawImageCoverInArea(images[1], cellW, 0, cellW, rowH);
+    drawImageCoverInArea(images[2], 0, rowH, W, rowH);
+    drawImageCoverInArea(images[3], 0, rowH * 2, cellW, rowH);
+    drawImageCoverInArea(images[4], cellW, rowH * 2, cellW, rowH);
+  }
+}
+
 function drawCoverImage() {
   if (!state.image) {
     const grd = ctx.createLinearGradient(0, 0, W, DESIGN_H);
@@ -223,13 +275,12 @@ function drawCoverImage() {
     return;
   }
 
-  const img = state.image;
-  const scale = Math.max(W / img.width, DESIGN_H / img.height);
-  const dw = img.width * scale;
-  const dh = img.height * scale;
-  const dx = (W - dw) / 2;
-  const dy = (DESIGN_H - dh) / 2;
-  ctx.drawImage(img, dx, dy, dw, dh);
+  const images = state.images.length ? state.images : [state.image];
+  if (images.length > 1) {
+    drawMultiImageBackground(images.slice(0, 5));
+    return;
+  }
+  drawImageCoverInArea(images[0], 0, 0, W, DESIGN_H);
 }
 
 function drawGradientScrims() {
@@ -1880,18 +1931,36 @@ function render() {
   ctx.restore();
 }
 
-function loadImage(file) {
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    const img = new Image();
-    img.onload = () => {
-      state.image = img;
-      render();
+function readImageFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => resolve(img);
+      img.src = reader.result;
     };
-    img.src = reader.result;
-  };
-  reader.readAsDataURL(file);
+    reader.readAsDataURL(file);
+  });
+}
+
+async function loadImages(fileList) {
+  const files = Array.from(fileList || [])
+    .filter((file) => file.type.startsWith("image/"))
+    .slice(0, 5);
+  if (!files.length) return;
+
+  try {
+    const images = await Promise.all(files.map(readImageFile));
+    state.images = images;
+    state.image = images[0];
+    if (refs.uploadLabel) refs.uploadLabel.textContent = `已选择 ${images.length} 张图片`;
+    render();
+  } catch (error) {
+    console.error("图片读取失败", error);
+    if (refs.uploadLabel) refs.uploadLabel.textContent = "图片读取失败，请重新选择";
+  }
 }
 
 function syncTemplateCards() {
@@ -1937,6 +2006,7 @@ function renderTemplateThumbnails() {
   if (!refs.templateGallery || !state.defaultImage) return;
   const savedTemplate = refs.template.value;
   const savedImage = state.image;
+  const savedImages = state.images;
   const savedValues = {
     title: refs.title.value,
     area: refs.area.value,
@@ -1945,6 +2015,7 @@ function renderTemplateThumbnails() {
   };
 
   state.image = state.defaultImage;
+  state.images = [state.defaultImage];
   refs.templateGallery.querySelectorAll(".template-card").forEach((card) => {
     const templateId = card.dataset.templateId;
     const defaults = templateDefaults[templateId] || {};
@@ -1973,6 +2044,7 @@ function renderTemplateThumbnails() {
 
   refs.template.value = savedTemplate;
   state.image = savedImage;
+  state.images = savedImages;
   Object.entries(savedValues).forEach(([key, value]) => {
     refs[key].value = value;
   });
@@ -1984,7 +2056,10 @@ function loadDefaultCoverImage() {
   const img = new Image();
   img.onload = () => {
     state.defaultImage = img;
-    if (!state.image) state.image = img;
+    if (!state.image) {
+      state.image = img;
+      state.images = [img];
+    }
     render();
     renderTemplateThumbnails();
   };
@@ -1992,7 +2067,7 @@ function loadDefaultCoverImage() {
 }
 
 refs.imageInput.addEventListener("change", (event) => {
-  loadImage(event.target.files[0]);
+  loadImages(event.target.files);
 });
 
 refs.template.addEventListener("change", () => {
@@ -2005,7 +2080,8 @@ Object.values(refs).forEach((element) => {
     element === refs.imageInput ||
     element === refs.download ||
     element === refs.template ||
-    element === refs.templateGallery
+    element === refs.templateGallery ||
+    element === refs.uploadLabel
   ) return;
   element.addEventListener("input", render);
   element.addEventListener("change", render);
