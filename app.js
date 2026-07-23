@@ -152,6 +152,18 @@ const templateDefaults = {
     location: "一起吃饭|孩子写作业|朋友坐到深夜",
     layout: "岛台备菜｜餐桌聊天｜阳台晒被",
   },
+  multiImageStory: {
+    title: "生活切片",
+    area: "家的几个瞬间",
+    location: "拼在一起才是生活",
+    layout: "",
+  },
+  splitMomentPoster: {
+    title: "家的几个瞬间",
+    area: "拼在一起才是生活",
+    location: "",
+    layout: "",
+  },
 };
 
 const W = canvas.width;
@@ -1832,6 +1844,119 @@ function drawPropertyPostcardTemplate() {
   ctx.restore();
 }
 
+function drawMultiImageStoryTemplate() {
+  const title = getValue("title");
+  const headline = getValue("area");
+  const location = getValue("location");
+  const displayFamily = `"Cover PangMen", "Cover FangYuan", "Cover ShuHei", "Microsoft YaHei", sans-serif`;
+
+  function fitStoryFont(text, startSize, maxWidth, minSize, weight = 900) {
+    let size = startSize;
+    while (size > minSize) {
+      ctx.font = `${weight} ${size}px ${displayFamily}`;
+      if (ctx.measureText(text).width <= maxWidth) break;
+      size -= 3;
+    }
+    return size;
+  }
+
+  function drawOutlinedText(text, x, y, size, lineWidth, align = "left") {
+    ctx.font = `900 ${size}px ${displayFamily}`;
+    ctx.textAlign = align;
+    ctx.strokeStyle = "rgba(168,168,168,0.9)";
+    ctx.lineWidth = lineWidth;
+    ctx.lineJoin = "round";
+    ctx.miterLimit = 2;
+    ctx.strokeText(text, x, y);
+    ctx.fillStyle = "#ff9f00";
+    ctx.fillText(text, x, y);
+  }
+
+  ctx.save();
+  ctx.textBaseline = "middle";
+
+  const shade = ctx.createLinearGradient(0, 600, 0, 1320);
+  shade.addColorStop(0, "rgba(0,0,0,0)");
+  shade.addColorStop(0.24, "rgba(0,0,0,0.42)");
+  shade.addColorStop(0.5, "rgba(0,0,0,0.58)");
+  shade.addColorStop(0.76, "rgba(0,0,0,0.42)");
+  shade.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = shade;
+  ctx.fillRect(0, 600, W, 720);
+
+  ctx.shadowColor = "rgba(0,0,0,0.38)";
+  ctx.shadowBlur = 12;
+  ctx.shadowOffsetY = 6;
+
+  const titleSize = fitStoryFont(title, 62, 540, 34);
+  drawOutlinedText(title, 165, 805, titleSize, 13);
+
+  const headlineSize = fitStoryFont(headline, 178, 900, 86);
+  drawOutlinedText(headline, W / 2, 970, headlineSize, 25, "center");
+
+  const locationSize = fitStoryFont(location, 68, 620, 36);
+  drawOutlinedText(location, 920, 1135, locationSize, 15, "right");
+  ctx.restore();
+}
+
+function drawSplitMomentPosterTemplate() {
+  const title = getValue("title");
+  const subtitle = getValue("area");
+  const displayFamily = `"Cover FangYuan", "Cover ShuHei", "Microsoft YaHei", sans-serif`;
+
+  function fitMomentFont(text, startSize, maxWidth, minSize, weight = 900) {
+    let size = startSize;
+    while (size > minSize) {
+      ctx.font = `${weight} ${size}px ${displayFamily}`;
+      if (ctx.measureText(text).width <= maxWidth) break;
+      size -= 3;
+    }
+    return size;
+  }
+
+  function drawMomentText(text, x, y, size, fill, strokeWidth) {
+    ctx.font = `900 ${size}px ${displayFamily}`;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.lineJoin = "round";
+    ctx.miterLimit = 2;
+    ctx.strokeStyle = "rgba(76,74,72,0.94)";
+    ctx.lineWidth = strokeWidth;
+    ctx.strokeText(text, x, y);
+    ctx.fillStyle = fill;
+    ctx.fillText(text, x, y);
+  }
+
+  ctx.save();
+
+  ctx.fillStyle = "rgba(222,216,210,0.68)";
+  ctx.fillRect(105, 805, 920, 190);
+  ctx.fillStyle = "rgba(222,216,210,0.62)";
+  ctx.fillRect(105, 1000, 730, 145);
+
+  ctx.fillStyle = "#ff5b35";
+  ctx.fillRect(84, 765, 22, 380);
+
+  ctx.strokeStyle = "rgba(255,255,255,0.92)";
+  ctx.lineWidth = 9;
+  ctx.beginPath();
+  ctx.moveTo(0, 992);
+  ctx.lineTo(W, 992);
+  ctx.stroke();
+
+  ctx.shadowColor = "rgba(0,0,0,0.24)";
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetY = 4;
+
+  const titleSize = fitMomentFont(title, 128, 835, 66);
+  drawMomentText(title, 142, 900, titleSize, "#ffffff", 20);
+
+  const subtitleSize = fitMomentFont(subtitle, 72, 650, 40);
+  drawMomentText(subtitle, 145, 1068, subtitleSize, "#ffc21a", 13);
+
+  ctx.restore();
+}
+
 function drawAvatar(x, y, r) {
   const grd = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
   grd.addColorStop(0, "#ffc936");
@@ -1924,6 +2049,10 @@ function render() {
     drawWhiteFrameCityTemplate();
   } else if (templateId === "propertyPostcard") {
     drawPropertyPostcardTemplate();
+  } else if (templateId === "multiImageStory") {
+    drawMultiImageStoryTemplate();
+  } else if (templateId === "splitMomentPoster") {
+    drawSplitMomentPosterTemplate();
   } else {
     drawEstateBoldTemplate();
   }

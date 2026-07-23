@@ -42,6 +42,8 @@ This repository contains a browser-based Xiaohongshu real-estate cover generator
 - `retroOrangeGreen`: 复古橙绿海报版
 - `whiteFrameCity`: 白框城市杂志版
 - `propertyPostcard`: 好房明信片版
+- `multiImageStory`: 多图叙事拼贴版
+- `splitMomentPoster`: 家的瞬间拼接版
 
 ## Editing conventions
 
