@@ -164,6 +164,12 @@ const templateDefaults = {
     location: "",
     layout: "",
   },
+  blackOrangeEmotion: {
+    title: "家的情绪",
+    area: "住进去才懂",
+    location: "空间不是参数",
+    layout: "它决定每天怎样发生",
+  },
 };
 
 const W = canvas.width;
@@ -1957,6 +1963,62 @@ function drawSplitMomentPosterTemplate() {
   ctx.restore();
 }
 
+function drawBlackOrangeEmotionTemplate() {
+  const title = getValue("title");
+  const subtitle = getValue("area");
+  const location = getValue("location");
+  const details = getValue("layout");
+  const displayFamily = `"Cover Optimum", "Cover ShuHei", "Microsoft YaHei", sans-serif`;
+  const bodyFamily = `"Cover ShuHei", "Microsoft YaHei", sans-serif`;
+  const ORANGE = "#ef6500";
+
+  function fitEmotionFont(text, startSize, maxWidth, minSize, family = displayFamily, weight = 900) {
+    let size = startSize;
+    while (size > minSize) {
+      ctx.font = `${weight} ${size}px ${family}`;
+      if (ctx.measureText(text).width <= maxWidth) break;
+      size -= 3;
+    }
+    return size;
+  }
+
+  ctx.save();
+
+  ctx.fillStyle = "rgba(137,55,8,0.72)";
+  ctx.fillRect(245, 610, 835, 445);
+  ctx.fillStyle = "rgba(0,0,0,0.35)";
+  ctx.fillRect(0, 455, 65, 250);
+  ctx.fillRect(0, 1425, 65, 455);
+
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "left";
+  ctx.fillStyle = ORANGE;
+  ctx.shadowColor = "rgba(0,0,0,0.28)";
+  ctx.shadowBlur = 7;
+
+  const titleSize = fitEmotionFont(title, 220, 940, 105);
+  ctx.font = `900 ${titleSize}px ${displayFamily}`;
+  ctx.fillText(title, 88, 1040);
+
+  const subtitleSize = fitEmotionFont(subtitle, 86, 470, 42);
+  ctx.font = `900 ${subtitleSize}px ${displayFamily}`;
+  ctx.fillText(subtitle, 385, 1210);
+
+  ctx.shadowColor = "transparent";
+  const locationSize = fitEmotionFont(location, 31, 270, 20, bodyFamily, 700);
+  ctx.font = `700 ${locationSize}px ${bodyFamily}`;
+  ctx.fillText(location, 92, 1218);
+
+  ctx.textAlign = "right";
+  const detailSize = fitEmotionFont(details, 29, 500, 20, bodyFamily, 700);
+  ctx.font = `700 ${detailSize}px ${bodyFamily}`;
+  ctx.fillText(details, 825, 1320);
+
+  ctx.fillStyle = "rgba(239,101,0,0.82)";
+  ctx.fillRect(385, 1255, 430, 5);
+  ctx.restore();
+}
+
 function drawAvatar(x, y, r) {
   const grd = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
   grd.addColorStop(0, "#ffc936");
@@ -2053,6 +2115,8 @@ function render() {
     drawMultiImageStoryTemplate();
   } else if (templateId === "splitMomentPoster") {
     drawSplitMomentPosterTemplate();
+  } else if (templateId === "blackOrangeEmotion") {
+    drawBlackOrangeEmotionTemplate();
   } else {
     drawEstateBoldTemplate();
   }
